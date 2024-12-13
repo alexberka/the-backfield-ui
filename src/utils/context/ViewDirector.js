@@ -3,13 +3,25 @@ import { useAuth } from '@/utils/context/authContext';
 import Loading from '@/components/Loading';
 import SignIn from '@/components/SignIn';
 import NavBar from '@/components/NavBar';
+import { usePathname } from 'next/navigation';
+import NavBarNoAuth from '../../components/NavBarNoAuth';
 
 function ViewDirectorBasedOnUserAuthStatus({ children }) {
   const { user, userLoading } = useAuth();
+  const pathname = usePathname();
 
   // if user state is null, then show loader
   if (userLoading) {
     return <Loading />;
+  }
+
+  if (!user && pathname.startsWith('/watch/')) {
+    return (
+      <>
+        <NavBarNoAuth />
+        {children}
+      </>
+    );
   }
 
   // what the user should see if they are logged in
