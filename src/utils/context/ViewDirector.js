@@ -5,6 +5,7 @@ import SignIn from '@/components/SignIn';
 import NavBar from '@/components/NavBar';
 import { usePathname } from 'next/navigation';
 import NavBarNoAuth from '../../components/NavBarNoAuth';
+import UserForm from '../../components/forms/UserForm';
 
 function ViewDirectorBasedOnUserAuthStatus({ children }) {
   const { user, userLoading } = useAuth();
@@ -29,7 +30,7 @@ function ViewDirectorBasedOnUserAuthStatus({ children }) {
     return (
       <>
         <NavBar /> {/* NavBar only visible if user is logged in and is in every view */}
-        {children}
+        {user.sessionKey ? children : <UserForm />}
       </>
     );
   }
