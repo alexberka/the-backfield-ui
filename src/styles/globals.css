@@ -2,3 +2,100 @@ body {
   background: black;
   color: white;
 }
+
+.playform {
+  width: 600px;
+  margin: 10px auto;
+  .playform-team-select {
+    display: flex;
+    justify-content: space-evenly;
+    width: 60%;
+    margin: 0 auto;
+    label {
+      font-size: 1.5rem;
+    }
+    input {
+      margin: 0 5px;
+    }
+  }
+  .playform-game-status {
+    display: flex;
+    .playform-game-period {
+      width: 50px;
+    }
+    .playform-to-go, .playform-line-of-scrimmage {
+      font-size: 1.2rem; 
+      margin-left: 10px;
+    }
+  }
+  .playform-fieldPosition {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;
+    border: 1px solid greenyellow;
+    background: black;
+  }
+  .playform-fieldPosition::-webkit-slider-thumb {
+    appearance: none;
+    width: 2px;
+    height: 10px;
+    background-color: greenyellow;
+  }
+  .playform-fieldPosition::-moz-slider-thumb {
+    appearance: none;
+    width: 2px;
+    height: 10px;
+    background-color: greenyellow;
+  }
+  .playform-fieldPosition.slider-home::-webkit-slider-thumb {
+    width: 0px;
+    height: 16px;
+    border-top: 8px solid transparent;
+    border-left: 5px solid greenyellow;
+    border-bottom: 8px solid transparent;
+    background: transparent;
+  }
+  .playform-fieldPosition.slider-home::-moz-slider-thumb {
+    width: 0px;
+    height: 16px;
+    border-top: 8px solid transparent;
+    border-right: 5px solid greenyellow;
+    border-bottom: 8px solid transparent;
+    background: transparent;
+  }
+  .playform-fieldPosition.slider-away::-webkit-slider-thumb {
+    width: 0px;
+    height: 16px;
+    border-top: 8px solid transparent;
+    border-right: 5px solid greenyellow;
+    border-bottom: 8px solid transparent;
+    background: transparent;
+  }
+  .playform-fieldPosition.slider-away::-moz-slider-thumb {
+    width: 0px;
+    height: 16px;
+    border-top: 8px solid transparent;
+    border-right: 5px solid greenyellow;
+    border-bottom: 8px solid transparent;
+    background: transparent;
+  }
+  
+  .playform-type-radios {
+    display: flex;
+    justify-content: space-around;
+  }
+  .playform-timebox {
+    background: none;
+    border: none;
+    width: 3.1rem;
+    font-family: monospace;
+    color: greenyellow;
+    font-size: 1.7rem;
+    height: 30px;
+  }
+  .playform-timebox:focus-visible {
+    outline: 1px solid greenyellow;
+  }
+}
