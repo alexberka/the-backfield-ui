@@ -11,7 +11,12 @@ const createPlay = (payload) =>
       },
       body: JSON.stringify(payload),
     })
-      .then((resp) => resp.json())
+      .then((resp) => {
+        if (resp.ok) {
+          return resp.json();
+        }
+        return resp;
+      })
       .then(resolve)
       .catch(reject);
   });
@@ -34,4 +39,4 @@ const deletePlay = (playId, sessionKey) =>
       .catch(reject);
   });
 
-export default { createPlay, deletePlay };
+export { createPlay, deletePlay };
