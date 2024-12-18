@@ -19,7 +19,7 @@ export default function ManageGameStream({ params }) {
     updateGameStream();
   }, []);
 
-  return <PlayForm gameId={parseInt(gameId, 10)} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} />;
+  return <PlayForm gameId={parseInt(gameId, 10)} onUpdate={updateGameStream} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} />;
 }
 
 ManageGameStream.propTypes = {
