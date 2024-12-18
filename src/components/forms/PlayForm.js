@@ -5,6 +5,7 @@ import { useAuth } from '../../utils/context/authContext';
 import { createPlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
+import parsePlayerPossession from '../../utils/statAnalysis';
 
 const initialState = {
   id: 0,
@@ -127,6 +128,17 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   // const removeFromArray = (item, array) => {
 
   // }
+
+  const possessionTeam = () => {
+    const playerId = parsePlayerPossession(formData);
+    if (homeTeam.players.filter((p) => p.id === playerId).length > 0) {
+      return 'home';
+    }
+    if (awayTeam.players.filter((p) => p.id === playerId).length > 0) {
+      return 'away';
+    }
+    return '';
+  };
 
   const handleDisplay = (e = { target: { name: '' } }) => {
     const { name, value } = e.target;
@@ -354,9 +366,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             {formData.kickoff && 'Ball'} on {fieldPositionToString(formData.fieldPositionStart)}
           </div>
         )}
-      </div>
-      <div>
-        <i>Starting Field Position</i>
       </div>
       <FieldPositionSlider name="fieldPositionStart" value={formData?.fieldPositionStart} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'home' : 'away'} clearOption={false} />
       {formData.down !== 0 && (
@@ -598,9 +607,9 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       />
       <input className="playform-timebox" name="clockEnd-seconds" type="number" min={!formData.clockEnd ? 0 : -1} max={formData.clockEnd < formData.clockStart ? 60 : (formData.clockStart || 0) % 60} value={formData.clockEnd === null ? '' : ((formData.clockEnd || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
       <div>
-        <i>Ending Field Position</i> {fieldPositionToString(formData.fieldPositionEnd)}
+        <i>{parsePlayerPossession(formData)} Ending Field Position</i> {fieldPositionToString(formData.fieldPositionEnd)}
       </div>
-      <FieldPositionSlider name="fieldPositionEnd" value={formData?.fieldPositionEnd} onChange={handleChange} />
+      <FieldPositionSlider name="fieldPositionEnd" value={formData?.fieldPositionEnd} onChange={handleChange} possession={possessionTeam()} />
       <div className="playform-buttons">
         <button type="submit">Submit</button>
         <button type="button" onClick={allReset}>
