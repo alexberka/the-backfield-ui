@@ -138,4 +138,11 @@ body {
   }
   /* .playform-timebox:focus-visible {
   } */
+  label {
+    display: flex;
+  }
+}
+
+.player-select {
+  display: inline;
 }

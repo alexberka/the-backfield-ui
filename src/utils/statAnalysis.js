@@ -8,6 +8,9 @@ const parsePlayerPossession = (formData) => {
   hasPossession.push(formData.kickReturnerId ?? 0);
   hasPossession.push(formData.interceptedById ?? 0);
   hasPossession.push(formData.kickBlockRecoveredById ?? 0);
+  if (formData.fieldGoal && formData.kickGood) {
+    hasPossession.push(formData.kickerId);
+  }
 
   // foreach (FumbleSubmitDTO fumble in formData.Fumbles)
   // {
@@ -24,8 +27,9 @@ const parsePlayerPossession = (formData) => {
   }
   const hasIds = hasPossession.filter((id) => id !== 0);
   const cedesIds = cedesPossession.filter((id) => id !== 0);
+  // console.warn(cedesPossession, cedesIds)
 
-  cedesIds.foreach((id) => {
+  cedesIds.forEach((id) => {
     if (hasIds.includes(id)) {
       const removeIndex = hasIds.indexOf(id);
       delete hasIds[removeIndex];
@@ -36,7 +40,8 @@ const parsePlayerPossession = (formData) => {
 
   if (endPossession.length === 1) {
     return endPossession[0];
-  } if (formData.fieldGoal && formData.kickGood) {
+  }
+  if (formData.fieldGoal && formData.kickGood) {
     return formData.kickerId;
   }
 
@@ -89,4 +94,45 @@ const parsePlayerPossession = (formData) => {
   // return (player.TeamId == homeTeamId ? homeTeamId : awayTeamId, false);
 };
 
-export default parsePlayerPossession;
+const validatePlayData = (formData, homeTeam, awayTeam) => {
+  if (formData.fieldPositionStart === null || formData.teamId != null || formData.gameId != null) {
+    return null;
+  }
+
+  const updatedFormData = { ...formData };
+  const playerId = parsePlayerPossession(formData);
+  let playerWithBall = {};
+  if (homeTeam?.players.filter((p) => p.id === playerId).length > 0) {
+    const index = homeTeam.players.findIndex((p) => p.id === playerId);
+    playerWithBall = { ...homeTeam.players[index] };
+  } else if (awayTeam?.players.filter((p) => p.id === playerId).length > 0) {
+    const index = awayTeam.players.findIndex((p) => p.id === playerId);
+    playerWithBall = { ...awayTeam.players[index] };
+  }
+
+  if (formData.fieldPositionEnd === null && !formData.kickGood) {
+    return null;
+  }
+  if (formData.fieldGoal && formData.kickGood) {
+    updatedFormData.fieldPositionEnd = 50 * (playerWithBall.teamId === homeTeam.id ? 1 : -1);
+  }
+
+  if ((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) {
+    updatedFormData.touchdownPlayerId = playerWithBall.id;
+  } else {
+    updatedFormData.extraPoint = false;
+    updatedFormData.conversion = false;
+    updatedFormData.extraPointKickerId = null;
+    updatedFormData.extraPointGood = false;
+    updatedFormData.extraPointFake = false;
+    updatedFormData.conversionPasserId = null;
+    updatedFormData.conversionReceiverId = null;
+    updatedFormData.conversionRusherId = null;
+    updatedFormData.conversionGood = false;
+    updatedFormData.defensiveConversion = false;
+    updatedFormData.conversionReturnerId = null;
+  }
+  return updatedFormData;
+};
+
+export { parsePlayerPossession, validatePlayData };
