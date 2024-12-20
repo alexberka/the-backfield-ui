@@ -6,6 +6,7 @@ import { createPlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
 import { parsePlayerPossession, validatePlayData } from '../../utils/statAnalysis';
+import PlayerMultiSelect from '../PlayerMultiSelect';
 
 const initialState = {
   id: 0,
@@ -60,6 +61,23 @@ const initialState = {
   laterals: [],
   penalties: [],
   sessionKey: '',
+};
+
+const initialFumbleCreator = {
+  id: null,
+  fumbleCommittedById: null,
+  fumbledAt: null,
+  fumbleForcedById: null,
+  fumbleRecoveredById: null,
+  fumbleRecoveredAt: null,
+};
+
+const initialLateralCreator = {
+  id: null,
+  prevCarrierId: null,
+  newCarrierId: null,
+  possessionAt: null,
+  carriedTo: null,
 };
 
 const initialDisplay = {
@@ -123,14 +141,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const [formDisplay, setFormDisplay] = useState(initialDisplay);
   const { user } = useAuth();
   const [playerWithBall, setPlayerWithBall] = useState({});
-
-  // const addToArray = (item, array) => {
-
-  // }
-
-  // const removeFromArray = (item, array) => {
-
-  // }
+  const [fumbleCreator, setFumbleCreator] = useState(initialFumbleCreator);
+  const [lateralCreator, setLateralCreator] = useState(initialLateralCreator);
 
   const handleDisplay = (e = { target: { name: '' } }) => {
     const { name, value } = e.target;
@@ -181,9 +193,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     }
   };
 
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    if (value === 'true' || value === 'false') {
+    if (Array.isArray(value)) {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else if (value === 'true' || value === 'false') {
       setFormData((prev) => ({
         ...prev,
         [name]: value !== 'false',
@@ -229,6 +246,74 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         handleChange({ target: { name, value } });
       }
     }
+  };
+
+  const handleFumbleChange = (e) => {
+    const { name, value } = e.target;
+    setFumbleCreator((prev) => ({ ...prev, [name]: value !== 'null' ? Number(value) : null }));
+  };
+
+  const handleFumbleAdd = () => {
+    if (fumbleCreator.fumbleCommittedById !== null) {
+      let nextFumbleId = 0;
+      formData.fumbles.forEach((fumble) => {
+        if (fumble.id > nextFumbleId) {
+          nextFumbleId = fumble.id;
+        }
+      });
+      setFormData((prev) => ({
+        ...prev,
+        fumbles: [
+          ...formData.fumbles,
+          {
+            ...fumbleCreator,
+            id: nextFumbleId + 1,
+          },
+        ],
+      }));
+      setFumbleCreator(initialFumbleCreator);
+    }
+  };
+
+  const handleFumbleRemove = (removeId) => {
+    setFormData((prev) => ({
+      ...prev,
+      fumbles: formData.fumbles.filter((f) => f.id !== removeId),
+    }));
+  };
+
+  const handleLateralChange = (e) => {
+    const { name, value } = e.target;
+    setLateralCreator((prev) => ({ ...prev, [name]: value !== 'null' ? Number(value) : null }));
+  };
+
+  const handleLateralAdd = () => {
+    if (lateralCreator.prevCarrierId !== null && lateralCreator.newCarrierId !== null) {
+      let nextLateralId = 0;
+      formData.laterals.forEach((lateral) => {
+        if (lateral.id > nextLateralId) {
+          nextLateralId = lateral.id;
+        }
+      });
+      setFormData((prev) => ({
+        ...prev,
+        laterals: [
+          ...formData.laterals,
+          {
+            ...lateralCreator,
+            id: nextLateralId + 1,
+          },
+        ],
+      }));
+      setLateralCreator(initialLateralCreator);
+    }
+  };
+
+  const handleLateralRemove = (removeId) => {
+    setFormData((prev) => ({
+      ...prev,
+      laterals: formData.laterals.filter((f) => f.id !== removeId),
+    }));
   };
 
   const allReset = () => {
@@ -505,7 +590,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         {/* )} */}
       </div>
       {/* )} */}
-      <div>
+      <div className="pf-kickblock">
         <label>
           <p>Blocked</p>
           <input type="checkbox" name="kickBlocked" value={!formData.kickBlocked} checked={formData.kickBlocked} onChange={handleChange} />
@@ -566,6 +651,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             />
           </label>
         </div>
+        <p>Pass Defenders</p>
+        <PlayerMultiSelect name="passDefenderIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.passDefenderIds} />
         {/* <div>
             {formData.passDefenderIds.map((defenderId) => (
               <div key={defenderId}>{awayTeam.players.filter((player) => player.id === defenderId)}</div>
@@ -620,6 +707,83 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         {/* )} */}
       </div>
       {/* )} */}
+      <div className="laterals">
+        <p>Laterals</p>
+        <div>
+          <p>From</p>
+          <PlayerSelect name="prevCarrierId" players={[...(playerById(lateralCreator.newCarrierId)?.teamId === awayTeam.id ? [] : homeTeam.players.filter((p) => p.id !== lateralCreator.newCarrierId)), ...(playerById(lateralCreator.newCarrierId)?.teamId === homeTeam.id ? [] : awayTeam.players.filter((p) => p.id !== lateralCreator.newCarrierId))]} onChange={handleLateralChange} value={lateralCreator.prevCarrierId || 'null'} />
+          <p>to</p>
+          <PlayerSelect name="newCarrierId" players={[...(playerById(lateralCreator.prevCarrierId)?.teamId === awayTeam.id ? [] : homeTeam.players.filter((p) => p.id !== lateralCreator.prevCarrierId)), ...(playerById(lateralCreator.prevCarrierId)?.teamId === homeTeam.id ? [] : awayTeam.players.filter((p) => p.id !== lateralCreator.prevCarrierId))]} onChange={handleLateralChange} value={lateralCreator.newCarrierId || 'null'} />
+          <p>at {fieldPositionToString(lateralCreator.possessionAt)}</p>
+          <FieldPositionSlider name="possessionAt" value={lateralCreator?.possessionAt} onChange={handleLateralChange} possession={lateralCreator.newCarrierId && (playerById(lateralCreator.newCarrierId).teamId === homeTeam.id ? 'home' : 'away')} />
+          <p>Advanced to {fieldPositionToString(fumbleCreator.fumbleRecoveredAt)}</p>
+          <FieldPositionSlider name="carriedTo" value={lateralCreator?.carriedTo} onChange={handleLateralChange} possession={lateralCreator.newCarrierId && (playerById(lateralCreator.newCarrierId).teamId === homeTeam.id ? 'home' : 'away')} />
+          <button type="button" onClick={handleLateralAdd}>
+            Add
+          </button>
+        </div>
+        <div>
+          {formData.laterals.map((l) => {
+            const prevCarrier = playerById(l.prevCarrierId);
+            const newCarrier = playerById(l.newCarrierId);
+            return (
+              <div key={l.id}>
+                <p>
+                  {prevCarrier.lastName}, {prevCarrier?.firstName[0]}. #{prevCarrier.jerseyNumber} lateral to {newCarrier.lastName}, {newCarrier?.firstName[0]}. #{newCarrier.jerseyNumber}
+                  {l.possessionAt !== null ? ` at ${fieldPositionToString(l.possessionAt)}` : ''}.{l.carriedTo !== null && l.possessionAt != null && ` Advanced ${(l.carriedTo - l.possessionAt) * (newCarrier.teamId === homeTeam.id ? 1 : -1)} yard${Math.abs(l.carriedTo - l.possessionAt) !== 1 && 's'} to ${fieldPositionToString(l.carriedTo)}.`}
+                </p>
+                <button type="button" onClick={() => handleLateralRemove(l.id)}>
+                  X
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="fumbles">
+        <p>Fumbles</p>
+        <div>
+          <p>Committed by</p>
+          <PlayerSelect name="fumbleCommittedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleCommittedById || 'null'} />
+          <p>Forced by</p>
+          <PlayerSelect name="fumbleForcedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleForcedById || 'null'} />
+          <p>at {fieldPositionToString(fumbleCreator.fumbledAt)}</p>
+          <FieldPositionSlider name="fumbledAt" value={fumbleCreator?.fumbledAt} onChange={handleFumbleChange} possession={fumbleCreator.fumbleCommittedById && (playerById(fumbleCreator.fumbleCommittedById).teamId === homeTeam.id ? 'home' : 'away')} />
+          <p>Recovered by</p>
+          <PlayerSelect name="fumbleRecoveredById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleRecoveredById || 'null'} />
+          <p>at {fieldPositionToString(fumbleCreator.fumbleRecoveredAt)}</p>
+          <FieldPositionSlider name="fumbleRecoveredAt" value={fumbleCreator?.fumbleRecoveredAt} onChange={handleFumbleChange} possession={fumbleCreator.fumbleRecoveredById && (playerById(fumbleCreator.fumbleRecoveredById).teamId === homeTeam.id ? 'home' : 'away')} />
+          <button type="button" onClick={handleFumbleAdd}>
+            Add
+          </button>
+        </div>
+        <div>
+          {formData.fumbles.map((f) => {
+            const committedBy = playerById(f.fumbleCommittedById);
+            const forcedBy = playerById(f.fumbleForcedById);
+            const recoveredBy = playerById(f.fumbleRecoveredById);
+            return (
+              <div key={f.id}>
+                <p>
+                  {committedBy.lastName}, {committedBy?.firstName[0]}. #{committedBy.jerseyNumber} fumble{f.fumbledAt !== null ? ` at ${fieldPositionToString(f.fumbledAt)}` : ''}
+                  {forcedBy.id !== undefined && `, Forced by ${forcedBy.lastName}, ${forcedBy?.firstName[0]}. #${forcedBy.jerseyNumber}`}
+                </p>
+                {recoveredBy.id !== undefined && (
+                  <p>
+                    Recovered by {recoveredBy.lastName}, {recoveredBy?.firstName[0]}. #{recoveredBy.jerseyNumber}
+                    {f.fumbleRecoveredAt !== null ? ` at ${fieldPositionToString(f.fumbleRecoveredAt)}` : ''}
+                  </p>
+                )}
+                <button type="button" onClick={() => handleFumbleRemove(f.id)}>
+                  X
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <p>Tacklers</p>
+      <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} />
       <input
         className="playform-timebox"
         name="clockEnd-minutes"
