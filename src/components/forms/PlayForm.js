@@ -7,6 +7,7 @@ import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
 import { parsePlayerPossession, validatePlayData } from '../../utils/statAnalysis';
 import PlayerMultiSelect from '../PlayerMultiSelect';
+import getAllPenalties from '../../api/penaltyData';
 
 const initialState = {
   id: 0,
@@ -80,6 +81,19 @@ const initialLateralCreator = {
   carriedTo: null,
 };
 
+const initialPenaltyCreator = {
+  id: null,
+  penaltyId: null,
+  playerId: null,
+  teamId: null,
+  enforced: false,
+  enforcedFrom: null,
+  noPlay: false,
+  lossOfDown: false,
+  autoFirstDown: false,
+  yardage: null,
+};
+
 const initialDisplay = {
   pass: false,
   rush: false,
@@ -143,6 +157,41 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const [playerWithBall, setPlayerWithBall] = useState({});
   const [fumbleCreator, setFumbleCreator] = useState(initialFumbleCreator);
   const [lateralCreator, setLateralCreator] = useState(initialLateralCreator);
+  const [penaltyCreator, setPenaltyCreator] = useState(initialPenaltyCreator);
+  const [penalties, setPenalties] = useState([]);
+
+  const fieldPositionToString = (fpAsInt) => {
+    if (fpAsInt == null) {
+      return '';
+    }
+    let asText = '';
+
+    if (fpAsInt > 0) {
+      asText += `${awayTeam.locationName || awayTeam.nickname} `;
+    } else if (fpAsInt < 0) {
+      asText += `${homeTeam.locationName || homeTeam.nickname} `;
+    }
+    const fieldNumber = 50 - Math.abs(fpAsInt);
+    if (fieldNumber <= 0) {
+      asText += 'Endzone';
+    } else {
+      asText += `${fieldNumber}`;
+    }
+
+    return asText;
+  };
+
+  const playerById = (playerId) => {
+    if (homeTeam?.players.filter((p) => p.id === playerId).length > 0) {
+      const index = homeTeam.players.findIndex((p) => p.id === playerId);
+      return homeTeam.players[index];
+    }
+    if (awayTeam?.players.filter((p) => p.id === playerId).length > 0) {
+      const index = awayTeam.players.findIndex((p) => p.id === playerId);
+      return awayTeam.players[index];
+    }
+    return {};
+  };
 
   const handleDisplay = (e = { target: { name: '' } }) => {
     const { name, value } = e.target;
@@ -312,7 +361,64 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const handleLateralRemove = (removeId) => {
     setFormData((prev) => ({
       ...prev,
-      laterals: formData.laterals.filter((f) => f.id !== removeId),
+      laterals: formData.laterals.filter((l) => l.id !== removeId),
+    }));
+  };
+
+  const handlePlayPenaltyChange = (e) => {
+    const { name, value } = e.target;
+    const [key] = name.split('-');
+    if (value === 'true' || value === 'false') {
+      setPenaltyCreator((prev) => ({ ...prev, [key]: value !== 'false' }));
+    } else {
+      setPenaltyCreator((prev) => ({ ...prev, [key]: value !== 'null' ? Number(value) : null }));
+    }
+
+    if (key === 'playerId' && value !== 'null') {
+      setPenaltyCreator((prev) => ({ ...prev, teamId: playerById(Number(value)).teamId }));
+    }
+    if (key === 'teamId' && playerById(penaltyCreator.playerId).teamId !== Number(value)) {
+      setPenaltyCreator((prev) => ({ ...prev, playerId: null }));
+    }
+
+    if (key === 'penaltyId') {
+      const index = penalties.findIndex((p) => p.id === Number(value));
+      setPenaltyCreator((prev) => ({
+        ...prev,
+        noPlay: penalties[index].noPlay,
+        lossOfDown: penalties[index].lossOfDown,
+        autoFirstDown: penalties[index].autoFirstDown,
+        yardage: penalties[index].yardage,
+      }));
+    }
+  };
+
+  const handlePlayPenaltyAdd = () => {
+    if (penaltyCreator.teamId !== null && penaltyCreator.penaltyId !== null && (!penaltyCreator.enforced || (penaltyCreator.enforced && penaltyCreator.enforcedFrom != null))) {
+      let nextPenaltyId = 0;
+      formData.penalties.forEach((penalty) => {
+        if (penalty.id > nextPenaltyId) {
+          nextPenaltyId = penalty.id;
+        }
+      });
+      setFormData((prev) => ({
+        ...prev,
+        penalties: [
+          ...formData.penalties,
+          {
+            ...penaltyCreator,
+            id: nextPenaltyId + 1,
+          },
+        ],
+      }));
+      setPenaltyCreator(initialPenaltyCreator);
+    }
+  };
+
+  const handlePlayPenaltyRemove = (removeId) => {
+    setFormData((prev) => ({
+      ...prev,
+      penalties: formData.penalties.filter((p) => p.id !== removeId),
     }));
   };
 
@@ -343,39 +449,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     }
   };
 
-  const fieldPositionToString = (fpAsInt) => {
-    if (fpAsInt == null) {
-      return '';
-    }
-    let asText = '';
-
-    if (fpAsInt > 0) {
-      asText += `${awayTeam.locationName || awayTeam.nickname} `;
-    } else if (fpAsInt < 0) {
-      asText += `${homeTeam.locationName || homeTeam.nickname} `;
-    }
-    const fieldNumber = 50 - Math.abs(fpAsInt);
-    if (fieldNumber <= 0) {
-      asText += 'Endzone';
-    } else {
-      asText += `${fieldNumber}`;
-    }
-
-    return asText;
-  };
-
-  const playerById = (playerId) => {
-    if (homeTeam?.players.filter((p) => p.id === playerId).length > 0) {
-      const index = homeTeam.players.findIndex((p) => p.id === playerId);
-      return homeTeam.players[index];
-    }
-    if (awayTeam?.players.filter((p) => p.id === playerId).length > 0) {
-      const index = awayTeam.players.findIndex((p) => p.id === playerId);
-      return awayTeam.players[index];
-    }
-    return {};
-  };
-
   useEffect(() => {
     if (newPlay) {
       setFormData((prev) => ({ ...prev, sessionKey: user.sessionKey, gameId }));
@@ -390,6 +463,10 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     const playerId = parsePlayerPossession(formData);
     setPlayerWithBall(playerById(playerId));
   }, [formData]);
+
+  useEffect(() => {
+    getAllPenalties(user.sessionKey).then(setPenalties);
+  }, []);
 
   if (!newPlay) {
     return (
@@ -653,13 +730,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         </div>
         <p>Pass Defenders</p>
         <PlayerMultiSelect name="passDefenderIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.passDefenderIds} />
-        {/* <div>
-            {formData.passDefenderIds.map((defenderId) => (
-              <div key={defenderId}>{awayTeam.players.filter((player) => player.id === defenderId)}</div>
-            ))}
-            <PlayerSelect name="Id" onChange={handleChange} 
-              players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players.filter((p) => !formData.passDefenderIds.includes(p.id))} />
-          </div> */}
         {/* {formDisplay?.interception && ( */}
         <div className="playform-interception">
           <div className="pf-int-statline">
@@ -707,7 +777,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         {/* )} */}
       </div>
       {/* )} */}
-      <div className="laterals">
+      <div className="pf-laterals">
         <p>Laterals</p>
         <div>
           <p>From</p>
@@ -740,7 +810,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           })}
         </div>
       </div>
-      <div className="fumbles">
+      <div className="pf-fumbles">
         <p>Fumbles</p>
         <div>
           <p>Committed by</p>
@@ -808,6 +878,78 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         <FieldPositionSlider name="fieldPositionEnd" value={formData?.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />
       </div>
       {/* )} */}
+      <div className="pf-play-penalties">
+        <p>Penalties</p>
+        <div>
+          <select className="penalty-select" name="penaltyId" onChange={handlePlayPenaltyChange} value={penaltyCreator.penaltyId || 1}>
+            {penalties.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          <div>
+            <label>
+              <input type="radio" name="teamId-penalty" value={homeTeam.id} checked={penaltyCreator.teamId === homeTeam.id} readOnly onClick={handlePlayPenaltyChange} />
+              {homeTeam.locationName}
+            </label>
+            <label>
+              {awayTeam.locationName}
+              <input type="radio" name="teamId-penalty" value={awayTeam.id} checked={penaltyCreator.teamId === awayTeam.id} onChange={handlePlayPenaltyChange} />
+            </label>
+          </div>
+          <p>Penalized Player</p>
+          <PlayerSelect name="playerId" players={[...(penaltyCreator.teamId !== homeTeam.id ? awayTeam.players : []), ...(penaltyCreator.teamId !== awayTeam.id ? homeTeam.players : [])]} onChange={handlePlayPenaltyChange} value={penaltyCreator.playerId || 'null'} />
+          <label>
+            Enforced:
+            <input type="checkbox" name="enforced" value={!penaltyCreator.enforced} checked={penaltyCreator.enforced} onChange={handlePlayPenaltyChange} />
+          </label>
+          <p>Enforced at {fieldPositionToString(penaltyCreator.enforcedFrom)}</p>
+          <FieldPositionSlider name="enforcedFrom" value={penaltyCreator?.enforcedFrom} onChange={handlePlayPenaltyChange} possession={penaltyCreator.teamId !== null && (penaltyCreator.teamId === homeTeam.id ? 'away' : 'home')} />
+          <label>
+            <p>Yardage</p>
+            <input type="number" name="yardage" min={0} max={100} value={penaltyCreator.yardage || 0} onChange={handlePlayPenaltyChange} />
+          </label>
+          <label>
+            No Play:
+            <input type="checkbox" name="noPlay" value={!penaltyCreator.noPlay} checked={penaltyCreator.noPlay} onChange={handlePlayPenaltyChange} />
+          </label>
+          <label>
+            Loss Of Down:
+            <input type="checkbox" name="lossOfDown" value={!penaltyCreator.lossOfDown} checked={penaltyCreator.lossOfDown} onChange={handlePlayPenaltyChange} />
+          </label>
+          <label>
+            Automatic First Down:
+            <input type="checkbox" name="autoFirstDown" value={!penaltyCreator.autoFirstDown} checked={penaltyCreator.autoFirstDown} onChange={handlePlayPenaltyChange} />
+          </label>
+          <button type="button" onClick={handlePlayPenaltyAdd}>
+            Add
+          </button>
+        </div>
+        <div>
+          {formData.penalties.map((pp) => {
+            const player = playerById(pp.playerId);
+            const penaltyIndex = penalties.findIndex((penalty) => penalty.id === pp.penaltyId);
+            const playPenaltyName = penalties[penaltyIndex].name;
+            const teamName = pp.teamId === homeTeam.id ? homeTeam.locationName : awayTeam.locationName;
+            return (
+              <div key={pp.id}>
+                <p>
+                  {playPenaltyName}, {teamName}
+                  {player.id ? ` (${player.lastName}, ${player?.firstName[0]}. #${player.jerseyNumber})` : ''}.{pp.enforced ? ` Enforced ${pp.yardage} yard${Math.abs(pp.yardage) !== 1 && 's'} from ${fieldPositionToString(pp.enforcedFrom)}.${pp.noPlay ? ' No Play.' : ''}${pp.lossOfDown ? ' Loss of Down.' : ''}${pp.autoFirstDown ? ' Automatic First Down.' : ''}` : ' Declined.'}
+                </p>
+                {/* <p>
+                  {prevCarrier.lastName}, {prevCarrier?.firstName[0]}. #{prevCarrier.jerseyNumber} lateral to {newCarrier.lastName}, {newCarrier?.firstName[0]}. #{newCarrier.jerseyNumber}
+                  {l.possessionAt !== null ? ` at ${fieldPositionToString(l.possessionAt)}` : ''}.{l.carriedTo !== null && l.possessionAt != null && ` Advanced ${(l.carriedTo - l.possessionAt) * (newCarrier.teamId === homeTeam.id ? 1 : -1)} yard${Math.abs(l.carriedTo - l.possessionAt) !== 1 && 's'} to ${fieldPositionToString(l.carriedTo)}.`}
+                </p> */}
+                <button type="button" onClick={() => handlePlayPenaltyRemove(pp.id)}>
+                  X
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
       {/* {!formData.fieldGoal && */}
       {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && (
         // (
@@ -1013,19 +1155,6 @@ PlayForm.propTypes = {
       newCarrierId: PropTypes.number,
       possessionAt: PropTypes.number,
       carriedTo: PropTypes.number,
-    }),
-    penalties: PropTypes.shape({
-      id: PropTypes.number,
-      playId: PropTypes.number,
-      penaltyId: PropTypes.number,
-      playerId: PropTypes.number,
-      teamId: PropTypes.number,
-      enforced: PropTypes.bool,
-      enforcedFrom: PropTypes.number,
-      noPlay: PropTypes.bool,
-      lossOfDown: PropTypes.bool,
-      autoFirstDown: PropTypes.bool,
-      yardage: PropTypes.number,
     }),
     sessionKey: PropTypes.string,
   }),

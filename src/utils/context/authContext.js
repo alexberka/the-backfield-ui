@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { firebase } from '@/utils/client';
 import { getUserByUID } from '../../api/userData';
 
@@ -13,6 +13,7 @@ AuthContext.displayName = 'AuthContext'; // Context object accepts a displayName
 function AuthProvider(props) {
   const [user, setUser] = useState(null);
   const [oAuthUser, setOAuthUser] = useState(null);
+  const hasLoggedIn = useRef(false);
 
   // there are 3 states for the user:
   // null = application initial state, not yet loaded
@@ -32,14 +33,17 @@ function AuthProvider(props) {
   useEffect(() => {
     firebase.auth().onAuthStateChanged((fbUser) => {
       if (fbUser) {
-        setOAuthUser(fbUser);
-        getUserByUID(fbUser.uid).then((appUser) => {
-          if (appUser.sessionKey) {
-            setUser({ fbUser, ...appUser });
-          } else {
-            setUser(fbUser);
-          }
-        });
+        if (!hasLoggedIn.current) {
+          setOAuthUser(fbUser);
+          getUserByUID(fbUser.uid).then((appUser) => {
+            if (appUser.sessionKey) {
+              setUser({ fbUser, ...appUser });
+            } else {
+              setUser(fbUser);
+            }
+          });
+          hasLoggedIn.current = true;
+        }
       } else {
         setOAuthUser(false);
         setUser(false);
