@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export default function PlayerSelect({ name, players, onChange, value }) {
   return (
-    <select name={name} onChange={onChange} value={value}>
+    <select className="player-select" name={name} onChange={onChange} value={value}>
       <option value="null">None</option>
       {players
         .sort((a, b) => a.lastName.localeCompare(b.lastName))
