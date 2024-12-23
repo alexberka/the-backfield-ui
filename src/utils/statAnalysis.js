@@ -95,7 +95,7 @@ const parsePlayerPossession = (formData) => {
 };
 
 const validatePlayData = (formData, homeTeam, awayTeam) => {
-  if (formData.fieldPositionStart === null || formData.teamId != null || formData.gameId != null) {
+  if (formData.fieldPositionStart === null || formData.teamId === null || formData.gameId === null) {
     return null;
   }
 
