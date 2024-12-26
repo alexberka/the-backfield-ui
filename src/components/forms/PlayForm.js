@@ -408,6 +408,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           {
             ...penaltyCreator,
             id: nextPenaltyId + 1,
+            enforcedFrom: penaltyCreator.enforcedFrom ?? formData.fieldPositionStart,
           },
         ],
       }));
@@ -460,8 +461,10 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   }, [playEdit]);
 
   useEffect(() => {
-    const playerId = parsePlayerPossession(formData);
-    setPlayerWithBall(playerById(playerId));
+    if (formData.teamId) {
+      const playerId = parsePlayerPossession(formData);
+      setPlayerWithBall(playerById(playerId));
+    }
   }, [formData]);
 
   useEffect(() => {

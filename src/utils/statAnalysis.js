@@ -12,22 +12,20 @@ const parsePlayerPossession = (formData) => {
     hasPossession.push(formData.kickerId);
   }
 
-  // foreach (FumbleSubmitDTO fumble in formData.Fumbles)
-  // {
-  //     cedesPossession.push(fumble.FumbleCommittedById);
-  //     hasPossession.push(fumble.FumbleRecoveredById ?? 0);
-  // }
-  // foreach (LateralSubmitDTO lateral in formData.Laterals)
-  // {
-  //     cedesPossession.push(lateral.PrevCarrierId);
-  //     hasPossession.push(lateral.NewCarrierId);
-  // }
+  formData.fumbles?.forEach((fumble) => {
+    cedesPossession.push(fumble.fumbleCommittedById);
+    hasPossession.push(fumble.fumbleRecoveredById ?? 0);
+  });
+  formData.laterals?.forEach((lateral) => {
+    cedesPossession.push(lateral.prevCarrierId);
+    hasPossession.push(lateral.newCarrierId ?? 0);
+  });
+
   if (formData?.completion || formData?.interceptedById != null) {
     cedesPossession.push(formData.passerId ?? 0);
   }
   const hasIds = hasPossession.filter((id) => id !== 0);
   const cedesIds = cedesPossession.filter((id) => id !== 0);
-  // console.warn(cedesPossession, cedesIds)
 
   cedesIds.forEach((id) => {
     if (hasIds.includes(id)) {
@@ -45,12 +43,12 @@ const parsePlayerPossession = (formData) => {
     return formData.kickerId;
   }
 
-  return null;
-  // if (hasPossession.Count > 1)
-  // {
-  //     return (0, true);
-  // }
-
+  if (endPossession.length === 0 && formData.fumbles.length > 0) {
+    const unrecoveredIndex = formData.fumbles.findIndex((f) => f.fumbleRecoveredById === null);
+    if (unrecoveredIndex >= 0) {
+      return formData.fumbles[unrecoveredIndex].fumbleCommittedById;
+    }
+  }
   // if (hasPossession.Count == 0)
   // {
   //     if (formData.FieldGoal && formData.KickGood)
@@ -79,6 +77,7 @@ const parsePlayerPossession = (formData) => {
   //     return (0, true);
   // }
 
+  return null;
   // if ((formData.TouchdownPlayerId != null && hasPossession[0] != formData.TouchdownPlayerId)
   //     || (formData.CedingPlayerId != null && hasPossession[0] != formData.CedingPlayerId))
   // {
