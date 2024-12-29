@@ -93,6 +93,153 @@ const parsePlayerPossession = (formData) => {
   // return (player.TeamId == homeTeamId ? homeTeamId : awayTeamId, false);
 };
 
+const parsePossessionChanges = (formData) => {
+  const possessionChanges = [];
+  if (formData.kickerId !== null && !formData.kickFake) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.kickerId,
+    });
+    if (formData.kickBlocked) {
+      possessionChanges.push({
+        ballFrom: formData.kickerId,
+        ballTo: formData.kickBlockRecoveredById,
+      });
+    } else {
+      possessionChanges.push({
+        ballFrom: formData.kickerId,
+        ballTo: formData.kickReturnerId,
+      });
+    }
+  } else if (formData.passerId !== null) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.passerId,
+    });
+    let ballTo = null;
+    if (formData.completion) {
+      ballTo = formData.receiverId;
+    } else if (formData.interceptedById) {
+      ballTo = formData.interceptedById;
+    }
+    possessionChanges.push({
+      ballFrom: formData.passerId,
+      ballTo,
+    });
+  } else if (formData.rusherId !== null) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.rusherId,
+    });
+  }
+
+  if (formData.fumbles.length === 0 && formData.laterals.length === 0) {
+    return possessionChanges;
+  }
+
+  const toPlace = [];
+
+  formData.fumbles?.forEach((fumble) => {
+    if (fumble.fumbleCommittedById !== fumble.fumbleRecoveredById) {
+      toPlace.push({
+        ballFrom: fumble.fumbleCommittedById,
+        ballTo: fumble.fumbleRecoveredById,
+        placed: false,
+        id: `fumble-${fumble.id}`,
+        changeIndex: toPlace.length + 1,
+      });
+    }
+  });
+  formData.laterals?.forEach((lateral) => {
+    toPlace.push({
+      ballFrom: lateral.prevCarrierId,
+      ballTo: lateral.newCarrierId,
+      placed: false,
+      id: `lateral-${lateral.id}`,
+      changeIndex: toPlace.length + 1,
+    });
+  });
+
+  const paths = [[]];
+
+  const checkPlacementLayer = (compareLength) => {
+    if (toPlace.length === 0) {
+      return true;
+    }
+    paths
+      .filter((p) => p.length === compareLength - 1)
+      .forEach((p) => {
+        let afterPlayerCompare = possessionChanges[possessionChanges.length - 1].ballTo;
+        let beforePlayerCompare = possessionChanges[0].ballTo;
+        if (p.some((index) => index > 0)) {
+          const afterChangeIndices = p.filter((index) => index > 0);
+          afterPlayerCompare = toPlace[afterChangeIndices[afterChangeIndices.length - 1] - 1].ballTo;
+        }
+        if (p.some((index) => index < 0)) {
+          const beforeChangeIndices = p.filter((index) => index < 0);
+          beforePlayerCompare = toPlace[Math.abs(beforeChangeIndices[beforeChangeIndices.length - 1]) - 1].ballFrom;
+        }
+
+        toPlace
+          .filter((change) => !p.some((index) => Math.abs(index) === change.changeIndex))
+          .forEach((change) => {
+            if (change.ballFrom === afterPlayerCompare) {
+              if (p.length === compareLength) {
+                const divergence = p.slice(0, -1);
+                divergence.push(change.changeIndex);
+                paths.push(divergence);
+              } else {
+                p.push(change.changeIndex);
+              }
+            }
+            if (change.ballTo === beforePlayerCompare) {
+              if (p.length === compareLength) {
+                const divergence = p.slice(0, -1);
+                divergence.push(-1 * change.changeIndex);
+                paths.push(divergence);
+              } else {
+                p.push(-1 * change.changeIndex);
+              }
+            }
+          });
+      });
+    if (paths.some((path) => path.length === compareLength)) {
+      if (compareLength === toPlace.length) {
+        return true;
+      }
+      return checkPlacementLayer(compareLength + 1);
+    }
+    return false;
+  };
+
+  const fitFound = checkPlacementLayer(1);
+
+  console.warn(paths);
+
+  if (fitFound) {
+    return paths
+      .filter((path) => path.length === toPlace.length)
+      .map((path) => {
+        const newChain = [...possessionChanges];
+        path.forEach((index) => {
+          const addChange = toPlace.find((change) => change.changeIndex === Math.abs(index));
+          if (index > 0) {
+            newChain.push(addChange);
+          } else {
+            newChain.shift();
+            newChain.unshift(addChange);
+            newChain.unshift({
+              ballFrom: null,
+              ballTo: addChange.ballFrom,
+            });
+          }
+        });
+        return newChain;
+      });
+  }
+  return null;
+};
+
 const validatePlayData = (formData, homeTeam, awayTeam) => {
   if (formData.fieldPositionStart === null || formData.teamId === null || formData.gameId === null) {
     return null;
@@ -109,29 +256,36 @@ const validatePlayData = (formData, homeTeam, awayTeam) => {
     playerWithBall = { ...awayTeam.players[index] };
   }
 
-  if (formData.fieldPositionEnd === null && !formData.kickGood) {
+  if (formData.fieldGoal) {
+    if (formData.kickGood) {
+      updatedFormData.fieldPositionEnd = 50 * (playerWithBall.teamId === homeTeam.id ? 1 : -1);
+    } else if (!formData.kickGood && formData.fieldPositionEnd === null) {
+      return null;
+    }
+  } else if (formData.fieldPositionEnd === null) {
     return null;
   }
-  if (formData.fieldGoal && formData.kickGood) {
-    updatedFormData.fieldPositionEnd = 50 * (playerWithBall.teamId === homeTeam.id ? 1 : -1);
+
+  if (formData.passerId !== null) {
+    if (formData.rusherId !== null) {
+      return null;
+    }
+    if (formData.rusherId !== null) {
+      return null;
+    }
   }
 
   if ((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) {
     updatedFormData.touchdownPlayerId = playerWithBall.id;
-  } else {
-    updatedFormData.extraPoint = false;
-    updatedFormData.conversion = false;
-    updatedFormData.extraPointKickerId = null;
-    updatedFormData.extraPointGood = false;
-    updatedFormData.extraPointFake = false;
-    updatedFormData.conversionPasserId = null;
-    updatedFormData.conversionReceiverId = null;
-    updatedFormData.conversionRusherId = null;
-    updatedFormData.conversionGood = false;
-    updatedFormData.defensiveConversion = false;
-    updatedFormData.conversionReturnerId = null;
+  } else if (formData.extraPoint !== false || formData.conversion !== false || formData.extraPointKickerId !== null || formData.extraPointGood !== false || formData.extraPointFake !== false || formData.conversionPasserId !== null || formData.conversionReceiverId !== null || formData.conversionRusherId !== null || formData.conversionGood !== false || formData.defensiveConversion !== false || formData.conversionReturnerId !== null) {
+    return null;
   }
+
+  if (!parsePossessionChanges(formData)) {
+    return null;
+  }
+
   return updatedFormData;
 };
 
-export { parsePlayerPossession, validatePlayData };
+export { parsePlayerPossession, parsePossessionChanges, validatePlayData };

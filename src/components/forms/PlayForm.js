@@ -5,7 +5,7 @@ import { useAuth } from '../../utils/context/authContext';
 import { createPlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
-import { parsePlayerPossession, validatePlayData } from '../../utils/statAnalysis';
+import { parsePlayerPossession, parsePossessionChanges, validatePlayData } from '../../utils/statAnalysis';
 import PlayerMultiSelect from '../PlayerMultiSelect';
 import getAllPenalties from '../../api/penaltyData';
 
@@ -439,8 +439,9 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.warn(formData);
+    console.warn(parsePossessionChanges(formData));
     const validatedFormData = validatePlayData(formData, homeTeam, awayTeam);
+    console.warn(formData, validatedFormData);
     if (validatedFormData) {
       createPlay(validatedFormData).then(() => {
         onUpdate();
