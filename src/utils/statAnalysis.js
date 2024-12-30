@@ -93,45 +93,151 @@ const parsePlayerPossession = (formData) => {
   // return (player.TeamId == homeTeamId ? homeTeamId : awayTeamId, false);
 };
 
-const validatePlayData = (formData, homeTeam, awayTeam) => {
-  if (formData.fieldPositionStart === null || formData.teamId === null || formData.gameId === null) {
-    return null;
+const parsePossessionChanges = (formData) => {
+  const possessionChanges = [];
+  if (formData.kickerId !== null && !formData.kickFake) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.kickerId,
+    });
+    if (formData.kickBlocked) {
+      possessionChanges.push({
+        ballFrom: formData.kickerId,
+        ballTo: formData.kickBlockRecoveredById,
+      });
+    } else {
+      possessionChanges.push({
+        ballFrom: formData.kickerId,
+        ballTo: formData.kickReturnerId,
+      });
+    }
+  } else if (formData.passerId !== null) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.passerId,
+    });
+    let ballTo = null;
+    if (formData.completion) {
+      ballTo = formData.receiverId;
+    } else if (formData.interceptedById) {
+      ballTo = formData.interceptedById;
+    }
+    possessionChanges.push({
+      ballFrom: formData.passerId,
+      ballTo,
+    });
+  } else if (formData.rusherId !== null) {
+    possessionChanges.push({
+      ballFrom: null,
+      ballTo: formData.rusherId,
+    });
   }
 
-  const updatedFormData = { ...formData };
-  const playerId = parsePlayerPossession(formData);
-  let playerWithBall = {};
-  if (homeTeam?.players.filter((p) => p.id === playerId).length > 0) {
-    const index = homeTeam.players.findIndex((p) => p.id === playerId);
-    playerWithBall = { ...homeTeam.players[index] };
-  } else if (awayTeam?.players.filter((p) => p.id === playerId).length > 0) {
-    const index = awayTeam.players.findIndex((p) => p.id === playerId);
-    playerWithBall = { ...awayTeam.players[index] };
+  if (formData.fumbles.length === 0 && formData.laterals.length === 0) {
+    return possessionChanges;
   }
 
-  if (formData.fieldPositionEnd === null && !formData.kickGood) {
-    return null;
-  }
-  if (formData.fieldGoal && formData.kickGood) {
-    updatedFormData.fieldPositionEnd = 50 * (playerWithBall.teamId === homeTeam.id ? 1 : -1);
-  }
+  const toPlace = [];
 
-  if ((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) {
-    updatedFormData.touchdownPlayerId = playerWithBall.id;
-  } else {
-    updatedFormData.extraPoint = false;
-    updatedFormData.conversion = false;
-    updatedFormData.extraPointKickerId = null;
-    updatedFormData.extraPointGood = false;
-    updatedFormData.extraPointFake = false;
-    updatedFormData.conversionPasserId = null;
-    updatedFormData.conversionReceiverId = null;
-    updatedFormData.conversionRusherId = null;
-    updatedFormData.conversionGood = false;
-    updatedFormData.defensiveConversion = false;
-    updatedFormData.conversionReturnerId = null;
+  formData.fumbles?.forEach((fumble) => {
+    if (fumble.fumbleCommittedById !== fumble.fumbleRecoveredById) {
+      toPlace.push({
+        ballFrom: fumble.fumbleCommittedById,
+        ballTo: fumble.fumbleRecoveredById,
+        placed: false,
+        id: `fumble-${fumble.id}`,
+        changeIndex: toPlace.length + 1,
+      });
+    }
+  });
+  formData.laterals?.forEach((lateral) => {
+    toPlace.push({
+      ballFrom: lateral.prevCarrierId,
+      ballTo: lateral.newCarrierId,
+      placed: false,
+      id: `lateral-${lateral.id}`,
+      changeIndex: toPlace.length + 1,
+    });
+  });
+
+  const paths = [[]];
+
+  const checkPlacementLayer = (compareLength) => {
+    if (toPlace.length === 0) {
+      return true;
+    }
+    paths
+      .filter((p) => p.length === compareLength - 1)
+      .forEach((p) => {
+        let afterPlayerCompare = possessionChanges[possessionChanges.length - 1].ballTo;
+        let beforePlayerCompare = possessionChanges[0].ballTo;
+        if (p.some((index) => index > 0)) {
+          const afterChangeIndices = p.filter((index) => index > 0);
+          afterPlayerCompare = toPlace[afterChangeIndices[afterChangeIndices.length - 1] - 1].ballTo;
+        }
+        if (p.some((index) => index < 0)) {
+          const beforeChangeIndices = p.filter((index) => index < 0);
+          beforePlayerCompare = toPlace[Math.abs(beforeChangeIndices[beforeChangeIndices.length - 1]) - 1].ballFrom;
+        }
+
+        toPlace
+          .filter((change) => !p.some((index) => Math.abs(index) === change.changeIndex))
+          .forEach((change) => {
+            if (change.ballFrom === afterPlayerCompare) {
+              if (p.length === compareLength) {
+                const divergence = p.slice(0, -1);
+                divergence.push(change.changeIndex);
+                paths.push(divergence);
+              } else {
+                p.push(change.changeIndex);
+              }
+            }
+            if (change.ballTo === beforePlayerCompare) {
+              if (p.length === compareLength) {
+                const divergence = p.slice(0, -1);
+                divergence.push(-1 * change.changeIndex);
+                paths.push(divergence);
+              } else {
+                p.push(-1 * change.changeIndex);
+              }
+            }
+          });
+      });
+    if (paths.some((path) => path.length === compareLength)) {
+      if (compareLength === toPlace.length) {
+        return true;
+      }
+      return checkPlacementLayer(compareLength + 1);
+    }
+    return false;
+  };
+
+  const fitFound = checkPlacementLayer(1);
+
+  console.warn(paths);
+
+  if (fitFound) {
+    return paths
+      .filter((path) => path.length === toPlace.length)
+      .map((path) => {
+        const newChain = [...possessionChanges];
+        path.forEach((index) => {
+          const addChange = toPlace.find((change) => change.changeIndex === Math.abs(index));
+          if (index > 0) {
+            newChain.push(addChange);
+          } else {
+            newChain.shift();
+            newChain.unshift(addChange);
+            newChain.unshift({
+              ballFrom: null,
+              ballTo: addChange.ballFrom,
+            });
+          }
+        });
+        return newChain;
+      });
   }
-  return updatedFormData;
+  return null;
 };
 
-export { parsePlayerPossession, validatePlayData };
+export { parsePlayerPossession, parsePossessionChanges };
