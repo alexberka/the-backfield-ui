@@ -6,6 +6,13 @@ body {
 .playform {
   width: 700px;
   margin: 10px auto;
+  .pf-section {
+    width: 100%;
+    border: 2px solid gray;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+  }
   .playform-team-select {
     display: flex;
     justify-content: space-evenly;
@@ -30,12 +37,16 @@ body {
     }
   }
   .pf-field-position {
+
+    position: relative;
     display: flex;
     flex-flow: column;
     gap: 5px;
     align-items: flex-end;
+    margin: 5px 0;
     .pf-field-position-slider {
       -webkit-appearance: none;
+      z-index: 2;
       appearance: none;
       width: 100%;
       height: 5px;
@@ -97,6 +108,13 @@ body {
       border: 0;
     }
     .pf-field-position-clear {
+      position: absolute;
+      z-index: 1;
+      right: 0;
+      top: -26px;
+      height: 19px;
+      font-size: 0.7rem;
+      line-height: 1;
       background: black;
       border-radius: 5px;
       border: 1px solid red;
@@ -136,8 +154,78 @@ body {
     height: 30px;
     outline: 1px solid greenyellow;
   }
-  /* .playform-timebox:focus-visible {
-  } */
+  .pf-creator-header {
+    display: flex;
+    height: auto;
+    align-items: baseline;
+    border-bottom: 1px solid greenyellow;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    p {
+      height: 20px;
+      margin-bottom: 0;
+    }
+    button {
+      background: none;
+      border-radius: 5px;
+      border: 1px solid greenyellow;
+      color: greenyellow;
+      padding: 5px;
+      line-height: 0.5;
+      margin-left: 6px;
+    }
+  }
+  .pf-creator-form {
+    width: 100%;
+    padding: 5px 0;
+    border-bottom: 1px solid greenyellow;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    p {
+      margin-bottom: 0;
+    }
+    .pf-creator-form-add {
+      background: none;
+      border-radius: 5px;
+      border: 2px solid gray;
+      color: greenyellow;
+      padding: 5px;
+      line-height: 0.8;
+      width: 50px;
+      margin-top: 4px;
+      margin-left: calc(50% - 25px);
+    }
+    .pf-lc-s1 {
+      display: flex;
+      gap: 10px;
+    }
+     {}
+  }
+  .pf-creator-collection {
+    .pf-creator-collection-item {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid darkgray;
+      padding: 4px 0;
+      button {
+        background: none;
+        border-radius: 5px;
+        border: 1px solid red;
+        color: greenyellow;
+        padding: 5px;
+        font-size: 0.7rem;
+        line-height: 0.5;
+        margin-right: 6px;
+        height: 20px;
+      }
+      p {
+        margin: 0;
+      }
+    }
+    .pf-creator-collection-item:first-of-type {
+      border-top: none;
+    }
+  }
   label {
     display: flex;
   }
@@ -145,4 +233,38 @@ body {
 
 .player-select {
   display: inline;
+}
+.player-multi {
+  .player-multi-header {
+    display: flex;
+    p {
+      margin: 0 10px 0 0;
+    }
+  }
+  .player-multi-collection {
+    .player-multi-collection-item {
+      display: flex;
+      align-items: center;
+      padding-top: 5px;
+      height: auto;
+      button {
+        background: none;
+        border-radius: 5px;
+        border: 1px solid red;
+        color: greenyellow;
+        padding: 5px;
+        font-size: 0.7rem;
+        line-height: 0.5;
+        margin-right: 6px;
+        height: 20px;
+      }
+      p {
+        margin: 0;
+      }
+    }
+    .player-multi-collection-item:first-of-type {
+      border-top: 1px solid darkgray;
+      margin-top: 5px;
+    }
+  }
 }

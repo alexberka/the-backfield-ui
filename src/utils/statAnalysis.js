@@ -49,48 +49,8 @@ const parsePlayerPossession = (formData) => {
       return formData.fumbles[unrecoveredIndex].fumbleCommittedById;
     }
   }
-  // if (hasPossession.Count == 0)
-  // {
-  //     if (formData.FieldGoal && formData.KickGood)
-  //     {
-  //         return (formData.TeamId, false);
-  //     }
-  //     FumbleSubmitDTO? notRecovered = formData.Fumbles.SingleOrDefault(f => f.FumbleRecoveredById == null);
-  //     if (notRecovered != null)
-  //     {
-  //         Player? fumbler = await _playerRepository.GetSinglePlayerAsync(notRecovered.FumbleCommittedById);
-  //         if (fumbler == null || (fumbler.TeamId != homeTeamId && fumbler.TeamId != awayTeamId))
-  //         {
-  //             return (0, false);
-  //         }
-  //         if (Math.Abs(formData.FieldPositionEnd ?? 0) == 50)
-  //         {
-  //             return (fumbler.TeamId == homeTeamId ? awayTeamId : homeTeamId, false);
-  //         }
-  //         return (fumbler.TeamId, false);
-  //     }
-  //     if (((formData.Kickoff || formData.Punt) && formData.KickReturnerId == null)
-  //         || (formData.KickBlocked && formData.KickBlockRecoveredById == null))
-  //     {
-  //         return (formData.TeamId == homeTeamId ? awayTeamId : homeTeamId, false);
-  //     }
-  //     return (0, true);
-  // }
 
   return null;
-  // if ((formData.TouchdownPlayerId != null && hasPossession[0] != formData.TouchdownPlayerId)
-  //     || (formData.CedingPlayerId != null && hasPossession[0] != formData.CedingPlayerId))
-  // {
-  //     return (0, true);
-  // }
-
-  // Player? player = await _playerRepository.GetSinglePlayerAsync(hasPossession[0]);
-  // if (player == null || (player.TeamId != homeTeamId && player.TeamId != awayTeamId))
-  // {
-  //     return (0, false);
-  // }
-
-  // return (player.TeamId == homeTeamId ? homeTeamId : awayTeamId, false);
 };
 
 const parsePossessionChanges = (formData) => {
@@ -134,7 +94,7 @@ const parsePossessionChanges = (formData) => {
   }
 
   if (formData.fumbles.length === 0 && formData.laterals.length === 0) {
-    return possessionChanges;
+    return [possessionChanges];
   }
 
   const toPlace = [];
@@ -214,8 +174,6 @@ const parsePossessionChanges = (formData) => {
 
   const fitFound = checkPlacementLayer(1);
 
-  console.warn(paths);
-
   if (fitFound) {
     return paths
       .filter((path) => path.length === toPlace.length)
@@ -237,7 +195,7 @@ const parsePossessionChanges = (formData) => {
         return newChain;
       });
   }
-  return null;
+  return [[]];
 };
 
 export { parsePlayerPossession, parsePossessionChanges };
