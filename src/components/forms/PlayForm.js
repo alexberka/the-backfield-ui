@@ -5,7 +5,7 @@ import { useAuth } from '../../utils/context/authContext';
 import { createPlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
-import { parsePlayerPossession, parsePossessionChanges, validatePlayData } from '../../utils/statAnalysis';
+import { parsePlayerPossession, parsePossessionChanges } from '../../utils/statAnalysis';
 import PlayerMultiSelect from '../PlayerMultiSelect';
 import getAllPenalties from '../../api/penaltyData';
 
@@ -100,6 +100,7 @@ const initialDisplay = {
   kickoff: false,
   fieldGoal: false,
   punt: false,
+  kickBlock: false,
   interception: false,
   fakeToPass: false,
   fakeToRush: false,
@@ -107,51 +108,52 @@ const initialDisplay = {
   twoPointRush: false,
 };
 
-const retainPlay = {
-  passerId: null,
-  receiverId: null,
-  completion: false,
-  rusherId: null,
-  tacklerIds: [],
-  passDefenderIds: [],
-  kickoff: false,
-  punt: false,
-  fieldGoal: false,
-  kickerId: null,
-  kickReturnerId: null,
-  kickFieldedAt: null,
-  kickFairCatch: false,
-  kickGood: false,
-  kickTouchback: false,
-  kickFake: false,
-  touchdownPlayerId: null,
-  extraPoint: false,
-  conversion: false,
-  extraPointKickerId: null,
-  extraPointGood: false,
-  extraPointFake: false,
-  conversionPasserId: null,
-  conversionReceiverId: null,
-  conversionRusherId: null,
-  conversionGood: false,
-  defensiveConversion: false,
-  conversionReturnerId: null,
-  safety: false,
-  cedingPlayerId: null,
-  fumbles: [],
-  interceptedById: null,
-  interceptedAt: null,
-  kickBlocked: false,
-  kickBlockedById: null,
-  kickBlockRecoveredById: null,
-  kickBlockRecoveredAt: null,
-  laterals: [],
-  penalties: [],
-};
+// const retainPlay = {
+//   passerId: null,
+//   receiverId: null,
+//   completion: false,
+//   rusherId: null,
+//   tacklerIds: [],
+//   passDefenderIds: [],
+//   kickoff: false,
+//   punt: false,
+//   fieldGoal: false,
+//   kickerId: null,
+//   kickReturnerId: null,
+//   kickFieldedAt: null,
+//   kickFairCatch: false,
+//   kickGood: false,
+//   kickTouchback: false,
+//   kickFake: false,
+//   touchdownPlayerId: null,
+//   extraPoint: false,
+//   conversion: false,
+//   extraPointKickerId: null,
+//   extraPointGood: false,
+//   extraPointFake: false,
+//   conversionPasserId: null,
+//   conversionReceiverId: null,
+//   conversionRusherId: null,
+//   conversionGood: false,
+//   defensiveConversion: false,
+//   conversionReturnerId: null,
+//   safety: false,
+//   cedingPlayerId: null,
+//   fumbles: [],
+//   interceptedById: null,
+//   interceptedAt: null,
+//   kickBlocked: false,
+//   kickBlockedById: null,
+//   kickBlockRecoveredById: null,
+//   kickBlockRecoveredAt: null,
+//   laterals: [],
+//   penalties: [],
+// };
 
 export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdit = initialState }) {
   const [newPlay, setNewPlay] = useState(false);
   const [formData, setFormData] = useState({});
+  const [submitFormData, setSubmitFormData] = useState(null);
   const [formDisplay, setFormDisplay] = useState(initialDisplay);
   const { user } = useAuth();
   const [playerWithBall, setPlayerWithBall] = useState({});
@@ -196,45 +198,45 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const handleDisplay = (e = { target: { name: '' } }) => {
     const { name, value } = e.target;
     if (name === 'pass' || name === 'rush' || name === 'fieldGoal' || name === 'kickoff' || name === 'punt') {
-      let { down, toGain } = formData;
+      // let { down, toGain } = formData;
 
-      if (!formDisplay.kickoff && name === 'kickoff') {
-        down = 0;
-        toGain = null;
-      } else if (formDisplay.kickoff && (value === 'false' || name !== 'kickoff')) {
-        down = playEdit.down || 0;
-        toGain = playEdit.toGain || null;
-      }
+      // if (!formDisplay.kickoff && name === 'kickoff') {
+      //   down = 0;
+      //   toGain = null;
+      // } else if (formDisplay.kickoff && (value === 'false' || name !== 'kickoff')) {
+      //   down = playEdit.down || 0;
+      //   toGain = playEdit.toGain || null;
+      // }
 
       setFormDisplay({ ...initialDisplay, [name]: value !== 'false' });
-      setFormData((prev) => ({
-        ...prev,
-        ...retainPlay,
-        down,
-        toGain,
-      }));
+      // setFormData((prev) => ({
+      //   ...prev,
+      //   ...retainPlay,
+      //   down,
+      //   toGain,
+      // }));
 
-      if (name === 'fieldGoal' || name === 'kickoff' || name === 'punt') {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: value !== 'false',
-        }));
-      }
+      // if (name === 'fieldGoal' || name === 'kickoff' || name === 'punt') {
+      //   setFormData((prev) => ({
+      //     ...prev,
+      //     [name]: value !== 'false',
+      //   }));
+      // }
     } else if (name.toLowerCase().includes('fake')) {
       setFormDisplay((prev) => ({ ...prev, fakeToPass: false, fakeToRush: false, [name]: value !== 'false' }));
 
-      if (value === 'false' || (value === 'true' && !formDisplay[name])) {
-        setFormData((prev) => ({
-          ...prev,
-          ...retainPlay,
-          kickerId: formData.kickerId,
-          kickFake: name !== 'kickFake',
-        }));
-      }
+      // if (value === 'false' || (value === 'true' && !formDisplay[name])) {
+      //   setFormData((prev) => ({
+      //     ...prev,
+      //     ...retainPlay,
+      //     kickerId: formData.kickerId,
+      //     kickFake: name !== 'kickFake',
+      //   }));
+      // }
     } else if (name.toLowerCase().includes('twopoint')) {
       setFormDisplay((prev) => ({ ...prev, twoPointPass: false, twoPointRush: false, [name]: value !== 'false' }));
-    } else if (name === '') {
-      setFormData((prev) => ({ ...prev, ...retainPlay }));
+      // } else if (name === '') {
+      //   setFormData((prev) => ({ ...prev, ...retainPlay }));
     } else if (value === 'true' || value === 'false') {
       setFormDisplay((prev) => ({ ...prev, [name]: value !== 'false' }));
     } else {
@@ -437,13 +439,201 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     setFormData((prev) => ({ ...prev, ...resetValues }));
   };
 
+  const validatedFormData = () => {
+    // fieldPositionStart, teamId, gameId cannot be null
+    if (formData.fieldPositionStart === null || formData.teamId === null || formData.gameId === null) {
+      return null;
+    }
+
+    const updatedFormData = { ...formData };
+
+    if (!formDisplay.pass && !formDisplay.fakeToPass) {
+      updatedFormData.passerId = null;
+      updatedFormData.receiverId = null;
+      updatedFormData.completion = false;
+      updatedFormData.passDefenderIds = [];
+      updatedFormData.interceptedById = null;
+      updatedFormData.interceptedAt = null;
+    }
+    if (!formDisplay.interception) {
+      updatedFormData.interceptedById = null;
+      updatedFormData.interceptedAt = null;
+    } else {
+      updatedFormData.completion = false;
+    }
+    if (!formDisplay.rush && !formDisplay.fakeToRush) {
+      updatedFormData.rusherId = null;
+    }
+
+    updatedFormData.kickoff = formDisplay.kickoff;
+    updatedFormData.punt = formDisplay.punt;
+    updatedFormData.fieldGoal = formDisplay.fieldGoal;
+    updatedFormData.kickBlocked = formDisplay.kickBlock;
+    updatedFormData.kickFake = formDisplay.fakeToPass || formDisplay.fakeToRush;
+    // Play can only contain one of kickoff, punt, or field goal
+    if ((updatedFormData.kickoff && (updatedFormData.punt || updatedFormData.fieldGoal)) || (updatedFormData.punt && updatedFormData.fieldGoal)) {
+      return null;
+    }
+    if (!updatedFormData.kickoff && !updatedFormData.punt && !updatedFormData.fieldGoal) {
+      updatedFormData.kickerId = null;
+      updatedFormData.kickReturnerId = null;
+      updatedFormData.kickFieldedAt = null;
+      updatedFormData.kickFairCatch = null;
+      updatedFormData.kickGood = null;
+      updatedFormData.kickTouchback = null;
+      updatedFormData.kickFake = null;
+      updatedFormData.kickBlocked = false;
+      updatedFormData.kickBlockedById = null;
+      updatedFormData.kickBlockRecoveredById = false;
+      updatedFormData.kickBlockRecoveredAt = false;
+    }
+    if (!updatedFormData.fieldGoal) {
+      updatedFormData.kickGood = null;
+    }
+    if (!updatedFormData.fieldGoal && !updatedFormData.punt) {
+      updatedFormData.kickBlocked = false;
+      updatedFormData.kickFake = false;
+    }
+    if (!updatedFormData.punt && !updatedFormData.kickoff) {
+      updatedFormData.kickReturnerId = null;
+      updatedFormData.kickFieldedAt = null;
+      updatedFormData.kickFairCatch = null;
+      updatedFormData.kickTouchback = null;
+    }
+    if (!updatedFormData.kickBlocked) {
+      updatedFormData.kickBlockedById = null;
+      updatedFormData.kickBlockRecoveredById = false;
+      updatedFormData.kickBlockRecoveredAt = false;
+    }
+    if (updatedFormData.kickGood && (updatedFormData.kickBlocked || updatedFormData.kickFake)) {
+      return null;
+    }
+    if (updatedFormData.kickoff || updatedFormData.fieldGoal || updatedFormData.punt) {
+      if (updatedFormData.kickerId === null) {
+        return null;
+      }
+      if (!updatedFormData.kickFake && (updatedFormData.passerId || updatedFormData.rusherId)) {
+        return null;
+      }
+    }
+
+    // Non-kickoffs must have down and to gain lines, kickoffs must not
+    if (!updatedFormData.kickoff && (updatedFormData.down === 0 || updatedFormData.toGain === null)) {
+      return null;
+    }
+    if (updatedFormData.kickoff) {
+      updatedFormData.down = 0;
+      updatedFormData.toGain = null;
+    }
+
+    // toGain must be beyond fieldPositionStart line for both teams
+    if (updatedFormData.teamId === homeTeam.id && updatedFormData?.toGain < updatedFormData.fieldPositionStart) {
+      return null;
+    }
+    if (updatedFormData.teamId === awayTeam.id && updatedFormData?.toGain > updatedFormData.fieldPositionStart) {
+      return null;
+    }
+
+    // fieldPositionEnd is set to goalline on made field goals, else cannot be null
+    if (updatedFormData.kickGood) {
+      updatedFormData.fieldPositionEnd = 50 * (updatedFormData.teamId === homeTeam.id ? 1 : -1);
+    }
+    if (updatedFormData.fieldPositionEnd === null) {
+      return null;
+    }
+
+    // A play cannot be both a pass and a rush
+    if (updatedFormData.passerId !== null && updatedFormData.rusherId !== null) {
+      return null;
+    }
+
+    if (updatedFormData.passerId !== null) {
+      // A complete pass must have a receiver, and cannot have interception data or pass defenders
+      if (updatedFormData.completion && (updatedFormData.receiverId === null || updatedFormData.interceptedById !== null || updatedFormData.interceptedAt !== null || updatedFormData.passDefenders.length !== 0)) {
+        return null;
+      }
+    }
+
+    // Update touchdown, safety information if a play ends in either endzone
+    if ((!updatedFormData.kickGood && playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === -50)) {
+      updatedFormData.touchdownPlayerId = playerWithBall.id;
+      updatedFormData.conversion = formDisplay.twoPointPass || formDisplay.twoPointRush;
+      if (updatedFormData.extraPoint && updatedFormData.conversion && !updatedFormData.extraPointFake) {
+        return null;
+      }
+      if (!updatedFormData.extraPoint) {
+        updatedFormData.extraPointKickerId = null;
+        updatedFormData.extraPointGood = false;
+        updatedFormData.extraPointFake = false;
+      } else if (!updatedFormData.extraPointFake) {
+        updatedFormData.conversion = false;
+        updatedFormData.conversionPasserId = null;
+        updatedFormData.conversionReceiverId = null;
+        updatedFormData.conversionRusherId = null;
+        updatedFormData.conversionGood = false;
+        updatedFormData.defensiveConversion = false;
+        updatedFormData.conversionReturnerId = null;
+      }
+      if (updatedFormData.extraPointGood && updatedFormData.extraPointFake) {
+        return null;
+      }
+      if (!updatedFormData.conversion) {
+        updatedFormData.extraPointFake = false;
+        updatedFormData.conversionPasserId = null;
+        updatedFormData.conversionReceiverId = null;
+        updatedFormData.conversionRusherId = null;
+        updatedFormData.conversionGood = false;
+      }
+      if (!formDisplay.twoPointPass) {
+        updatedFormData.conversionPasserId = null;
+        updatedFormData.conversionReceiverId = null;
+      }
+      if (!formDisplay.twoPointRush) {
+        updatedFormData.conversionRusherId = null;
+      }
+      if (updatedFormData.conversionPasserId !== null && updatedFormData.conversionRusherId !== null) {
+        return null;
+      }
+      if ((updatedFormData.conversionGood || updatedFormData.extraPointGood) && updatedFormData.defensiveConversion) {
+        return null;
+      }
+      if (!updatedFormData.defensiveConversion) {
+        updatedFormData.conversionReturnerId = null;
+      }
+    } else {
+      updatedFormData.extraPoint = false;
+      updatedFormData.conversion = false;
+      updatedFormData.extraPointKickerId = null;
+      updatedFormData.extraPointGood = false;
+      updatedFormData.extraPointFake = false;
+      updatedFormData.conversionPasserId = null;
+      updatedFormData.conversionReceiverId = null;
+      updatedFormData.conversionRusherId = null;
+      updatedFormData.conversionGood = false;
+      updatedFormData.defensiveConversion = false;
+      updatedFormData.conversionReturnerId = null;
+    }
+
+    if ((!updatedFormData.kickTouchback && playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === -50)) {
+      updatedFormData.safety = true;
+      updatedFormData.cedingPlayerId = playerWithBall.id;
+    }
+
+    const possessionChains = parsePossessionChanges(updatedFormData);
+
+    if (!possessionChains || (possessionChains.length === 0 && !formData.penalties.some((p) => p.enforced))) {
+      return null;
+    }
+
+    return updatedFormData;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.warn(parsePossessionChanges(formData));
-    const validatedFormData = validatePlayData(formData, homeTeam, awayTeam);
-    console.warn(formData, validatedFormData);
-    if (validatedFormData) {
-      createPlay(validatedFormData).then(() => {
+    const newFormData = validatedFormData();
+    console.warn(formData, newFormData);
+    if (newFormData) {
+      createPlay(newFormData).then(() => {
         onUpdate();
         allReset();
         setNewPlay((prev) => !prev);
@@ -463,10 +653,15 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   useEffect(() => {
     if (formData.teamId) {
-      const playerId = parsePlayerPossession(formData);
-      setPlayerWithBall(playerById(playerId));
+      const newFormData = validatedFormData();
+      console.warn(newFormData);
+      setSubmitFormData(newFormData);
+      if (newFormData?.teamId) {
+        const playerId = parsePlayerPossession(newFormData);
+        setPlayerWithBall(playerById(playerId));
+      }
     }
-  }, [formData]);
+  }, [formData, formDisplay]);
 
   useEffect(() => {
     getAllPenalties(user.sessionKey).then(setPenalties);
@@ -1051,7 +1246,10 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       {/* )
         } */}
       <div className="playform-buttons">
-        <button type="submit">Submit</button>
+        {submitFormData === null && <div>Play is incomplete or illogical, double check form before submission</div>}
+        <button type="submit" disabled={!submitFormData}>
+          Submit
+        </button>
         <button type="button" onClick={allReset}>
           Reset
         </button>
