@@ -94,7 +94,7 @@ const parsePossessionChanges = (formData) => {
   }
 
   if (formData.fumbles.length === 0 && formData.laterals.length === 0) {
-    return possessionChanges;
+    return [possessionChanges];
   }
 
   const toPlace = [];
@@ -174,8 +174,6 @@ const parsePossessionChanges = (formData) => {
 
   const fitFound = checkPlacementLayer(1);
 
-  console.warn(paths);
-
   if (fitFound) {
     return paths
       .filter((path) => path.length === toPlace.length)
@@ -197,7 +195,7 @@ const parsePossessionChanges = (formData) => {
         return newChain;
       });
   }
-  return null;
+  return [[]];
 };
 
 export { parsePlayerPossession, parsePossessionChanges };
