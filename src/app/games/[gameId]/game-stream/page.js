@@ -19,6 +19,10 @@ export default function ManageGameStream({ params }) {
     updateGameStream();
   }, []);
 
+  if (!gameStream.nextPlay) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       {gameStream.homeTeamScore !== undefined && (
@@ -41,7 +45,7 @@ export default function ManageGameStream({ params }) {
               {gameStream.driveYards} Yard{gameStream.driveYards !== 1 && 's'}
             </p>
             <p>
-              {Math.floor(gameStream.driveTime / 60)}:{gameStream.driveTime % 60}
+              {Math.floor(gameStream.driveTime / 60)}:{(gameStream.driveTime % 60).toString().padStart(2, '0')}
             </p>
           </div>
         </div>
