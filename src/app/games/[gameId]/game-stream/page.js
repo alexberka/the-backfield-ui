@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import PlayForm from '../../../../components/forms/PlayForm';
-import getGameStream from '../../../../api/gameData';
+import { getGameStream } from '../../../../api/gameData';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;

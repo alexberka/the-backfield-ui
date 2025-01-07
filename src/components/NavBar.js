@@ -1,29 +1,31 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import Link from 'next/link';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav } from 'react-bootstrap';
+import { usePathname } from 'next/navigation';
 import { signOut } from '../utils/auth';
 
 export default function NavBar() {
+  const pathname = usePathname();
+
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+    <Navbar className="nav" expand="lg" variant="dark">
       <Container>
         <Link passHref href="/" className="navbar-brand">
-          THE BACKFIELD
+          <span className="nav-the">THE</span>
+          <span className="nav-backfield">BACKFIELD</span>
         </Link>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
-          <Nav className="me-auto">
-            {/* CLOSE NAVBAR ON LINK SELECTION: https://stackoverflow.com/questions/72813635/collapse-on-select-react-bootstrap-navbar-with-nextjs-not-working */}
-            <Link className="nav-link" href="/">
-              Home
-            </Link>
-          </Nav>
-
-          <Button variant="danger" onClick={signOut}>
-            Sign Out
-          </Button>
-        </Navbar.Collapse>
+        <Nav className="nav-items">
+          <Link className={`nav-link ${pathname.startsWith('/teams') && 'nav-active'}`} href="/teams">
+            TEAMS
+          </Link>
+          <Link className={`nav-link ${pathname.startsWith('/games') && 'nav-active'}`} href="/games">
+            GAMES
+          </Link>
+        </Nav>
+        <button className="button" type="button" onClick={signOut}>
+          SIGN OUT
+        </button>
       </Container>
     </Navbar>
   );

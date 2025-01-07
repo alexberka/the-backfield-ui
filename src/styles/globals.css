@@ -1,11 +1,175 @@
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
 body {
-  background: black;
+  background: #212121;
   color: white;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.nav {
+  box-shadow: inset 0 -8px 10px -5px greenyellow;
+  font-family: Verdana, Helvetica, sans-serif;
+  font-weight: bold;
+  .nav-the {
+    color: white;
+  }
+  .nav-backfield {
+    color: greenyellow;
+  }
+  .nav-items {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    flex-grow: 5;
+    margin: 0;
+    font-family: Tahoma, sans-serif;
+    .nav-active {
+      color: white;
+      text-decoration: overline;
+      text-decoration-color: greenyellow;
+    }
+  }
+  .button {
+    transform: scale(0.8);
+  }
+}
+
+.info-box {
+  display: flex;
+  position: relative;
+  width: 700px;
+  margin: 20px auto 40px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  .ib-left {
+    width: 50%;
+    position: relative;
+    .header-top-line, .header-bottom-line {
+      font-weight: bolder;
+    }
+    .header-top-line {
+      position: relative;
+      left: 10px;
+      font-size: 2rem;
+    }
+    .header-bottom-line {
+      position: absolute;
+      left: 140px;
+      top: 18px;
+      color: greenyellow;
+      font-size: 3rem;
+    }
+    .primary-color-bar, .secondary-color-bar {
+      color: gray;
+      opacity: 0.9;
+      position: absolute;
+      left: 0;
+      z-index: -2;
+      width: 120%;
+    }
+    .primary-color-bar {
+      top: 10px;
+    }
+    .secondary-color-bar {
+      top: 40px;
+    }
+  }
+  .ib-right {
+    width: 50%;
+    .ib-right-text {
+      display: block;
+      margin: 0;
+      font-weight: bolder;
+      text-align: right;
+    }
+    .ib-right-text:nth-of-type(even) {
+      color: greenyellow;
+    }
+  }
+}
+
+.list-container {
+  width: 700px;
+  margin: 20px auto;
+  .list-item, .list-header {
+    display: flex;
+    position: relative;
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    justify-content: space-around;
+    .list-header-text {
+      width: 60%;
+      text-align: left;
+      font-size: 1.2rem;
+      font-style: italic;
+    }
+    hr {
+      color: gray;
+      opacity: 0.9;
+      position: absolute;
+      left: 0;
+      width: 50%;
+      z-index: -2;
+    }
+    hr:last-of-type {
+      margin-left: 50%;
+    }
+  }
+  .list-item:hover {
+    transform: scale(1.2);
+    transition-duration: 0.04s;
+  }
+}
+
+.button {
+  background: #212121;
+  border-radius: 5px;
+  border: 1px solid greenyellow;
+  color: greenyellow;
+}
+.button:hover {
+  background: greenyellow;
+  color: #212121;
+}
+.button:disabled {
+  background: #212121;
+  color: #a1a1a1;
+  border: 1px solid #a1a1a1;
+}
+.button-red {
+  border: 1px solid red;
+}
+.button-red:hover {
+  background: #212121;
+  color: red;
+}
+
+.player-number {
+  position: absolute;
+  right: 22%;
+  bottom: -5px;
+  font-size: 2rem;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.player-position {
+  position: absolute;
+  left: 77%;
+  bottom: -6px;
+  font-size: 1.4rem;
+  opacity: 0.7;
+  z-index: 0;
+  color: greenyellow;
 }
 
 .playform {
   width: 700px;
-  margin: 10px auto;
+  margin: 10px auto 30px;
   .pf-section {
     width: 100%;
     border: 2px solid gray;
@@ -37,7 +201,6 @@ body {
     }
   }
   .pf-field-position {
-
     position: relative;
     display: flex;
     flex-flow: column;
@@ -52,7 +215,7 @@ body {
       height: 5px;
       border-radius: 5px;
       border: 1px solid greenyellow;
-      background: black;
+      background: #212121;
       flex-grow: 1;
     }
     .pf-field-position-slider::-webkit-slider-thumb {
@@ -115,7 +278,7 @@ body {
       height: 19px;
       font-size: 0.7rem;
       line-height: 1;
-      background: black;
+      background: #212121;
       border-radius: 5px;
       border: 1px solid red;
       color: greenyellow;
@@ -227,6 +390,12 @@ body {
   }
   label {
     display: flex;
+  }
+  .pf-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin: 10px 0;
   }
 }
 

@@ -645,9 +645,11 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   if (!newPlay) {
     return (
       <div className="playform">
-        <button type="button" onClick={() => setNewPlay((prev) => !prev)}>
-          Add Play
-        </button>
+        <div className="pf-buttons">
+          <button className="button" type="button" onClick={() => setNewPlay((prev) => !prev)}>
+            Add Play
+          </button>
+        </div>
       </div>
     );
   }
@@ -1302,16 +1304,16 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         </div>
       </div>
-      <div className="playform-buttons">
-        {submitFormData === null && <div>Play is incomplete or illogical, double check form before submission</div>}
-        <button type="submit" disabled={!submitFormData}>
+      {submitFormData === null && <div>Play is incomplete or illogical, double check form before submission</div>}
+      <div className="pf-buttons">
+        <button className="button" type="submit" disabled={!submitFormData}>
           Submit
         </button>
-        <button type="button" onClick={allReset}>
+        <button className="button button-red" type="button" onClick={allReset}>
           Reset
         </button>
-        <button type="button" onClick={() => setNewPlay(false)}>
-          Collapse
+        <button className="button" type="button" onClick={() => setNewPlay(false)}>
+          Collapse Form
         </button>
       </div>
     </form>
