@@ -503,7 +503,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       return null;
     }
 
-    // fieldPositionEnd is set to goalline on made field goals
+    // fieldPositionEnd is set to goalline on made field goals and touchbacks
     // 7 yards back on missed field goals
     // else cannot be null
     if (updatedFormData.kickGood || updatedFormData.kickTouchback) {
@@ -529,7 +529,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     }
 
     // Update touchdown, safety information if a play ends in either endzone
-    if ((!updatedFormData.kickGood && playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === -50)) {
+    if (!updatedFormData.kickGood && ((playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === -50))) {
       updatedFormData.touchdownPlayerId = playerWithBall.id;
       updatedFormData.conversion = formDisplay.twoPointPass || formDisplay.twoPointRush;
       if (updatedFormData.extraPoint && updatedFormData.conversion && !updatedFormData.extraPointFake) {
@@ -588,7 +588,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       updatedFormData.conversionReturnerId = null;
     }
 
-    if ((!updatedFormData.kickTouchback && playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === -50)) {
+    if (!updatedFormData.kickTouchback && ((playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === -50))) {
       updatedFormData.safety = true;
       updatedFormData.cedingPlayerId = playerWithBall.id;
     } else {
@@ -631,9 +631,11 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     if (formData.teamId) {
       const newFormData = validateFormData();
       setSubmitFormData(newFormData);
-      if (newFormData?.teamId) {
+      if (newFormData !== null) {
         const playerId = parsePlayerPossession(newFormData);
         setPlayerWithBall(playerById(playerId));
+      } else {
+        setPlayerWithBall({});
       }
     }
   }, [formData, formDisplay]);
