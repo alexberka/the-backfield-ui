@@ -635,7 +635,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         const playerId = parsePlayerPossession(newFormData);
         setPlayerWithBall(playerById(playerId));
       } else {
-        console.warn('nothing');
         setPlayerWithBall({});
       }
     }
