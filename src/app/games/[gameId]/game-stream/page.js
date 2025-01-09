@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import PlayForm from '../../../../components/forms/PlayForm';
 import { getGameStream } from '../../../../api/gameData';
+import GameStream from '../../../../components/GameStream';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;
@@ -50,6 +51,7 @@ export default function ManageGameStream({ params }) {
           </div>
         </div>
       )}
+      <GameStream gameStream={gameStream} />
       <PlayForm gameId={parseInt(gameId, 10)} onUpdate={updateGameStream} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} />
     </>
   );
