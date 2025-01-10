@@ -215,6 +215,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.warn(name, value);
     if (Array.isArray(value)) {
       setFormData((prev) => ({
         ...prev,
@@ -505,12 +506,16 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
     // fieldPositionEnd is set to goalline on made field goals and touchbacks
     // 7 yards back on missed field goals
+    // line of scrimmage on incomplete passes without tacklers
     // else cannot be null
     if (updatedFormData.kickGood || updatedFormData.kickTouchback) {
       updatedFormData.fieldPositionEnd = 50 * (updatedFormData.teamId === homeTeam.id ? 1 : -1);
     }
     if (updatedFormData.fieldGoal && !updatedFormData.kickGood && updatedFormData.kickBlockRecoveredAt === null && !updatedFormData.kickFake) {
       updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart + 7 * (updatedFormData.teamId === homeTeam.id ? -1 : 1);
+    }
+    if (updatedFormData.passerId !== null && !updatedFormData.completion && updatedFormData.tacklerIds.length === 0) {
+      updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart;
     }
     if (updatedFormData.fieldPositionEnd === null) {
       return null;
@@ -750,9 +755,9 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formData.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
           <div>
             <div>
-              <i>Ending Field Position</i> {fieldPositionToString(formData.fieldPositionEnd)}
+              <i>Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 ? formData.fieldPositionStart : formData.fieldPositionEnd)}
             </div>
-            <FieldPositionSlider name="fieldPositionEnd" value={formData?.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />
+            {(!formDisplay.pass || formData.completion || formData.tacklerIds.length > 0) && <FieldPositionSlider name="fieldPositionEnd" value={formData.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />}
           </div>
         )}
         {formDisplay.fieldGoal && formData.kickGood && (
@@ -853,7 +858,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                 </label>
               </div>
             )}
-            {!formData.kickFake && <FieldPositionSlider name="kickFieldedAt" value={formData?.kickFieldedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />}
+            {!formData.kickFake && (
+              <>
+                <div>
+                  <i>Fielded at</i> {fieldPositionToString(formData.kickFieldedAt)}
+                </div>
+                <FieldPositionSlider name="kickFieldedAt" value={formData?.kickFieldedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
+              </>
+            )}
           </div>
         )}
         {formDisplay.fieldGoal && (
@@ -945,34 +957,34 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
               <PlayerSelect name="passerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.passerId || 'null'} />
               <p>Receiver:</p>
               <PlayerSelect name="receiverId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.receiverId || 'null'} />
-              <label>
-                Complete:
-                <input
-                  type="checkbox"
-                  name="completion"
-                  value={!formData.completion}
-                  checked={formData.completion}
-                  onChange={(e) => {
-                    handleChange(e);
-                    selectiveReset(['interceptedById', 'interceptedAt']);
-                    handleDisplay({ target: { name: 'interception', value: 'false' } });
-                  }}
-                />
-              </label>
-              <label>
-                Interception:
-                <input
-                  type="checkbox"
-                  name="interception"
-                  value={!formDisplay.interception}
-                  checked={formDisplay?.interception}
-                  onChange={(e) => {
-                    handleDisplay(e);
-                    selectiveReset(['completion']);
-                  }}
-                />
-              </label>
             </div>
+            <label>
+              Complete:
+              <input
+                type="checkbox"
+                name="completion"
+                value={!formData.completion}
+                checked={formData.completion}
+                onChange={(e) => {
+                  handleChange(e);
+                  selectiveReset(['interceptedById', 'interceptedAt']);
+                  handleDisplay({ target: { name: 'interception', value: 'false' } });
+                }}
+              />
+            </label>
+            <label>
+              Interception:
+              <input
+                type="checkbox"
+                name="interception"
+                value={!formDisplay.interception}
+                checked={formDisplay?.interception}
+                onChange={(e) => {
+                  handleDisplay(e);
+                  selectiveReset(['completion']);
+                }}
+              />
+            </label>
             <PlayerMultiSelect name="passDefenderIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.passDefenderIds} header="Pass Defenders" />
             {formDisplay?.interception && (
               <div className="playform-interception">
@@ -1118,9 +1130,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         </div>
       </div>
-      <div className="pf-section">
-        <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" />
-      </div>
+      <div className="pf-section">{!playerWithBall.id ? <PlayerMultiSelect name="tacklerIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers Null" /> : <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" />}</div>
       {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
         <div className="pf-section">
           <div>

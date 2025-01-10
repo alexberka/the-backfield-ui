@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { getSingleTeam } from '../../../api/teamData';
 import { useAuth } from '../../../utils/context/authContext';
+import Loading from '../../../components/Loading';
 
 export default function ViewTeamInfo({ params }) {
   const [team, setTeam] = useState({});
@@ -15,7 +16,7 @@ export default function ViewTeamInfo({ params }) {
   }, [teamId, user]);
 
   if (!team.id) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

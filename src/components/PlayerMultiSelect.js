@@ -11,7 +11,7 @@ export default function PlayerMultiSelect({ name, players, onChange, value, head
   };
 
   useEffect(() => {
-    onChange({ target: { name, value: [] } });
+    onChange({ target: { name, value: value.filter((id) => players.some((p) => p.id === id)) } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [players]);
 

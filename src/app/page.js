@@ -1,29 +1,32 @@
 'use client';
 
- // any component that uses useAuth needs this because if a component directly imports useAuth, it needs to be a client component since useAuth uses React hooks.
+// any component that uses useAuth needs this because if a component directly imports useAuth, it needs to be a client component since useAuth uses React hooks.
 
-import { Button } from 'react-bootstrap';
 import { signOut } from '@/utils/auth'; // anything in the src dir, you can use the @ instead of relative paths
-import { useAuth } from '@/utils/context/authContext';
+import Link from 'next/link';
 
 function Home() {
-  const { user } = useAuth();
-
   return (
-    <div
-      className="text-center d-flex flex-column justify-content-center align-content-center"
-      style={{
-        height: '90vh',
-        padding: '30px',
-        maxWidth: '400px',
-        margin: '0 auto',
-      }}
-    >
-      <h1>Hello {user.displayName}! </h1>
-      <p>Click the button below to logout!</p>
-      <Button variant="danger" type="button" size="lg" className="copy-btn" onClick={signOut}>
-        Sign Out
-      </Button>
+    <div className="welcome-box">
+      <div className="welcome-logo">
+        <span className="welcome-the">THE</span>
+        <span className="welcome-backfield">BACKFIELD</span>
+      </div>
+      <div className="welcome-buttons">
+        <Link href="/teams">
+          <button className="button" type="button">
+            TEAMS
+          </button>
+        </Link>
+        <Link href="/games">
+          <button className="button" type="button">
+            GAMES
+          </button>
+        </Link>
+        <button className="button button-red" type="button" onClick={signOut}>
+          SIGN OUT
+        </button>
+      </div>
     </div>
   );
 }

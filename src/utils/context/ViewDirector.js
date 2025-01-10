@@ -29,7 +29,7 @@ function ViewDirectorBasedOnUserAuthStatus({ children }) {
   if (user) {
     return (
       <>
-        <NavBar /> {/* NavBar only visible if user is logged in and is in every view */}
+        {pathname !== '/' && <NavBar />} {/* NavBar only visible if user is logged in and is in every view */}
         {user.sessionKey ? children : <UserForm />}
       </>
     );

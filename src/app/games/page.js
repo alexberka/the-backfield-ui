@@ -15,7 +15,6 @@ export default function ViewAllGames() {
 
   return (
     <div className="list-container">
-      Game List
       {games.map((game) => (
         <Link key={game.id} href={`/games/${game.id}/game-stream`} className="list-item">
           {/* <hr style={{ color: team.colorPrimaryHex }} />

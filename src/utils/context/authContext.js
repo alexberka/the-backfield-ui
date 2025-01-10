@@ -45,6 +45,7 @@ function AuthProvider(props) {
           hasLoggedIn.current = true;
         }
       } else {
+        hasLoggedIn.current = false;
         setOAuthUser(false);
         setUser(false);
       }
