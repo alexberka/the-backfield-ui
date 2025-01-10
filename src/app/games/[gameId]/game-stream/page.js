@@ -26,32 +26,7 @@ export default function ManageGameStream({ params }) {
 
   return (
     <>
-      {gameStream.homeTeamScore !== undefined && (
-        <div className="game-stream">
-          <div className="game-stream-scores">
-            <h1>
-              {gameStream.homeTeam.locationName}&emsp;{gameStream.homeTeamScore}
-            </h1>
-            {gameStream.nextPlay.teamId != null && <h2 className={`gs-has-ball-${gameStream.nextPlay.teamId === gameStream.homeTeam.id ? 'home' : 'away'}`}>●</h2>}
-            <h1>
-              {gameStream.awayTeamScore}&emsp;{gameStream.awayTeam.locationName}
-            </h1>
-          </div>
-          <div className="game-stream-drive-info">
-            <h4>Current Drive</h4>
-            <p>
-              {gameStream.drivePlays} Play{gameStream.drivePlays !== 1 && 's'}
-            </p>
-            <p>
-              {gameStream.driveYards} Yard{gameStream.driveYards !== 1 && 's'}
-            </p>
-            <p>
-              {Math.floor(gameStream.driveTime / 60)}:{(gameStream.driveTime % 60).toString().padStart(2, '0')}
-            </p>
-          </div>
-        </div>
-      )}
-      <GameStream gameStream={gameStream} />
+      {gameStream.homeTeamScore !== undefined && <GameStream gameStream={gameStream} />}
       <PlayForm gameId={parseInt(gameId, 10)} onUpdate={updateGameStream} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} />
     </>
   );

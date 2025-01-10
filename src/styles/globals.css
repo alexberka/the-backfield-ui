@@ -438,37 +438,214 @@ body {
 }
 
 .game-stream {
-  .game-stream-scores {
+  position: relative;
+  width: 1100px;
+  margin: 10px auto 30px;
+  .game-stream-status {
     display: flex;
     width: 100%;
     justify-content: space-between;
     align-items: center;
     margin: 10px auto 0 auto;
-    h1 {
-      width: 45%;
+    .gs-status-home-name, .gs-status-away-name {
+      position: relative;
+      width: 420px;
+      .name-loc, .name-nick {
+        font-weight: bolder;
+      }
+      .name-loc {
+        position: relative;
+        font-size: 2rem;
+        color: white;
+      }
+      .name-nick {
+        position: absolute;
+        top: 18px;
+        color: greenyellow;
+        font-size: 3rem;
+      }
+      .primary-color-bar, .secondary-color-bar {
+        color: gray;
+        opacity: 0.95;
+        position: absolute;
+        left: 0;
+        z-index: -2;
+        width: 100%;
+      }
+      .primary-color-bar {
+        top: 10px;
+      }
+      .secondary-color-bar {
+        top: 40px;
+      }
     }
-    h1:first-of-type {
-      text-align: right;
+    .gs-status-home-score, .gs-status-away-score {
+      position: absolute;
+      top: -10px;
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+      z-index: 2;
+      text-shadow: 5px 5px black;
     }
-    h2 {
-      width: 10%;
-      font-size: 2rem;
-      padding: 0 10px;
+    .gs-status-home-name {
+      .name-loc {
+        left: 80px;
+      }
+      .name-nick {
+        left: 20px;
+      }
+      .gs-status-home-score {
+        right: -20px;
+      }
     }
-    .gs-has-ball-home {
-      text-align: left;
+    .gs-status-away-name {
+      .name-loc {
+        text-align: right;
+        right: 80px;
+      }
+      .name-nick {
+        right: 20px;
+      }
+      .gs-status-away-score {
+        left: -20px;
+      }
     }
-    .gs-has-ball-away {
-      text-align: right;
+    .gs-status-home-poss, .gs-status-away-poss {
+      width: 20px;
+      h2 {
+        margin: 0;
+      }
+    }
+    .gs-status-info {
+      .gssi-clock {
+        font-size: 1.2rem;
+      }
+      .gssi-ball-on {
+        font-size: 0.8rem;
+        color: greenyellow;
+      }
+      p {
+        text-align: center;
+        margin: 0;
+      }
     }
   }
-  .game-stream-drive-info {
-    width: 400px;
-    margin: auto;
-    p, h4 {
+  .gs-drive-info-topline {
+    position: relative;
+    width: 100%;
+    .game-stream-drive-info {
+      position: absolute;
+      top: 100px;
+      width: 200px;
       margin: auto;
-      width: 100%;
-      text-align: center;
+      p, h4 {
+        margin: auto;
+        width: 100%;
+        text-align: center;
+      }
+      .game-stream-current-drive-header {
+        color: greenyellow;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
     }
+  }
+  .gamestream-field {
+    position: relative;
+    display: flex;
+    width: 604px;
+    height: 267px;
+    /* border: 2px solid #45ff12; */
+    border: 2px solid greenyellow;
+    border-radius: 5px;
+    margin: 10px auto;
+    .gsf-to-gain {
+      position: absolute;
+      height: 100%;
+      width: 0;
+      border: 1px solid #eb5547;
+      left: 50%;
+    }
+    .gsf-drive {
+      position: absolute;
+      height: 100%;
+      width: 0;
+      left: 50%;
+      z-index: -2;
+    }
+    .gsf-yardline {
+      height: 100%;
+      width: 50px;
+      border-left: 1px solid white;
+      z-index: -1;
+    }
+    .gsf-home-team-endzone, .gsf-away-team-endzone {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 50px;
+      background: linear-gradient();
+      z-index: 2;
+      p {
+        margin: 0 auto;
+        height: 263px;
+        writing-mode: vertical-rl;
+        text-align: center;
+        vertical-align: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+        text-shadow: 2px 2px black;
+      }
+    }
+    .gsf-away-team-endzone {
+      right: 0;
+      border-radius: 0 3px 3px 0;
+    }
+    .gsf-home-team-endzone {
+      left: 0;
+      border-radius: 3px 0 0 3px;
+      p {
+        transform: rotate(-180deg);
+      }
+    }
+  }
+  .gs-last-play {
+    width: 800px;
+    margin: 0 auto;
+    .gs-last-play-header {
+      display: flex;
+      gap: 10px;
+      width: 600px;
+      margin: 10px auto 0;
+      font-size: 1rem;
+      font-weight: bold;
+      p {
+        margin: 0;
+      }
+      .gs-last-play-text {
+        color: white;
+      }
+      .gs-last-play-down {
+        color: greenyellow;
+      }
+    }
+  }
+}
+
+.play-segment {
+  .play-segment-line {
+    position: absolute;
+    border: 1px solid white;
+    top: 18px;
+    height: 0;
+  }
+  .play-segment-marker {
+    position: absolute;
+    top: 15px;
+    height: 0;
+    margin: 0;
+    border: 4px solid white;
+    border-radius: 4px;
   }
 }
