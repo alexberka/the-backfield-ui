@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import PlayForm from '../../../../components/forms/PlayForm';
 import { getGameStream } from '../../../../api/gameData';
 import GameStream from '../../../../components/GameStream';
+import Loading from '../../../../components/Loading';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;
@@ -21,7 +22,7 @@ export default function ManageGameStream({ params }) {
   }, []);
 
   if (!gameStream.nextPlay) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

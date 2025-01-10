@@ -12,7 +12,7 @@ export default function NavBarNoAuth() {
           <span className="nav-the">THE</span>
           <span className="nav-backfield">BACKFIELD</span>
         </Link>
-        <button className="button button-red" type="button" onClick={signIn}>
+        <button className="button" type="button" onClick={signIn}>
           SIGN IN
         </button>
       </Container>

@@ -24,6 +24,43 @@ export default function GameStream({ gameStream }) {
     return asText;
   };
 
+  const driveFillColor = (edge) => {
+    let color = '';
+    const defaultPrimary = '#a1a1a1';
+    const defaultSecondary = '#d1d1d1';
+    switch (edge) {
+      case 'top':
+        color = gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorPrimaryHex : gameStream.awayTeam.colorPrimaryHex;
+        if (color === '') {
+          color = defaultPrimary;
+        }
+        break;
+      case 'left':
+        if (gameStream.nextPlay.teamId === gameStream.homeTeam.id) {
+          color = gameStream.homeTeam.colorSecondaryHex !== '' ? gameStream.homeTeam.colorSecondaryHex : defaultSecondary;
+        } else {
+          color = gameStream.awayTeam.colorPrimaryHex !== '' ? gameStream.awayTeam.colorPrimaryHex : defaultPrimary;
+        }
+        break;
+      case 'right':
+        if (gameStream.nextPlay.teamId === gameStream.homeTeam.id) {
+          color = gameStream.homeTeam.colorPrimaryHex !== '' ? gameStream.homeTeam.colorPrimaryHex : defaultPrimary;
+        } else {
+          color = gameStream.awayTeam.colorSecondaryHex !== '' ? gameStream.awayTeam.colorSecondaryHex : defaultSecondary;
+        }
+        break;
+      case 'bottom':
+        color = gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorSecondaryHex : gameStream.awayTeam.colorSecondaryHex;
+        if (color === '') {
+          color = defaultSecondary;
+        }
+        break;
+      default:
+        break;
+    }
+    return color !== '' ? color : '#a1a1a1';
+  };
+
   return (
     <div className="game-stream">
       <div className="game-stream-status">
@@ -82,10 +119,10 @@ export default function GameStream({ gameStream }) {
           style={{
             left: 300 - 1 + (gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.drivePositionStart : gameStream.drivePositionStart - gameStream.driveYards) * 5,
             width: gameStream.driveYards * 5,
-            borderTop: `132px solid ${gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorPrimaryHex : gameStream.awayTeam.colorPrimaryHex}`,
-            borderRight: `${(gameStream.driveYards / 2) * 5}px solid ${gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorPrimaryHex : gameStream.awayTeam.colorPrimaryHex}`,
-            borderBottom: `132px solid ${gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorSecondaryHex : gameStream.awayTeam.colorSecondaryHex}`,
-            borderLeft: `${(gameStream.driveYards / 2) * 5 + 1}px solid ${gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.homeTeam.colorSecondaryHex : gameStream.awayTeam.colorSecondaryHex}`,
+            borderTop: `132px solid ${driveFillColor('top')}`,
+            borderRight: `${(gameStream.driveYards / 2) * 5}px solid ${driveFillColor('right')}`,
+            borderBottom: `132px solid ${driveFillColor('bottom')}`,
+            borderLeft: `${(gameStream.driveYards / 2) * 5 + 1}px solid ${driveFillColor('left')}`,
           }}
         />
         <div

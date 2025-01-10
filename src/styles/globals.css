@@ -8,6 +8,32 @@ body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
+.welcome-box {
+  width: 450px;
+  height: 150px;
+  box-shadow: inset 0 -55px 5px -50px greenyellow;
+  margin: 30vh auto;
+  .welcome-logo {
+    display: flex;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    .welcome-the {
+      color: white;
+    }
+    .welcome-backfield {
+      color: greenyellow;
+    }
+  }
+  .welcome-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    font-size: 1.2rem;
+  }
+}
+
 .nav {
   box-shadow: inset 0 -8px 10px -5px greenyellow;
   font-family: Verdana, Helvetica, sans-serif;

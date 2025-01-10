@@ -23,7 +23,7 @@ export default function NavBar() {
             GAMES
           </Link>
         </Nav>
-        <button className="button" type="button" onClick={signOut}>
+        <button className="button button-red" type="button" onClick={signOut}>
           SIGN OUT
         </button>
       </Container>
