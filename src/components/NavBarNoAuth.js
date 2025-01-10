@@ -1,19 +1,20 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import Link from 'next/link';
-import { Navbar, Container, Button } from 'react-bootstrap';
+import { Navbar, Container } from 'react-bootstrap';
 import { signIn } from '../utils/auth';
 
 export default function NavBarNoAuth() {
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+    <Navbar className="nav" bg="dark" variant="dark">
       <Container>
         <Link passHref href="/" className="navbar-brand">
-          The Backfield
+          <span className="nav-the">THE</span>
+          <span className="nav-backfield">BACKFIELD</span>
         </Link>
-        <Button variant="info" onClick={signIn}>
-          Sign In
-        </Button>
+        <button className="button button-red" type="button" onClick={signIn}>
+          SIGN IN
+        </button>
       </Container>
     </Navbar>
   );
