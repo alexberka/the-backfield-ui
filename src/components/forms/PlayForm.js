@@ -514,7 +514,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     if (updatedFormData.fieldGoal && !updatedFormData.kickGood && updatedFormData.kickBlockRecoveredAt === null && !updatedFormData.kickFake) {
       updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart + 7 * (updatedFormData.teamId === homeTeam.id ? -1 : 1);
     }
-    if (updatedFormData.passerId !== null && !updatedFormData.completion && updatedFormData.tacklerIds.length === 0) {
+    if (updatedFormData.passerId !== null && !updatedFormData.completion && updatedFormData.tacklerIds.length === 0 && !formDisplay.interception) {
       updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart;
     }
     if (updatedFormData.fieldPositionEnd === null) {
@@ -755,9 +755,9 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formData.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
           <div>
             <div>
-              <i>Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 ? formData.fieldPositionStart : formData.fieldPositionEnd)}
+              <i>Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 && !formDisplay.interception ? formData.fieldPositionStart : formData.fieldPositionEnd)}
             </div>
-            {(!formDisplay.pass || formData.completion || formData.tacklerIds.length > 0) && <FieldPositionSlider name="fieldPositionEnd" value={formData.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />}
+            {(!formDisplay.pass || formData.completion || formData.tacklerIds.length > 0 || formDisplay.interception) && <FieldPositionSlider name="fieldPositionEnd" value={formData.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />}
           </div>
         )}
         {formDisplay.fieldGoal && formData.kickGood && (
@@ -1130,7 +1130,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         </div>
       </div>
-      <div className="pf-section">{!playerWithBall.id ? <PlayerMultiSelect name="tacklerIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers Null" /> : <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" />}</div>
+      <div className="pf-section">{!playerWithBall.id ? <PlayerMultiSelect name="tacklerIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" /> : <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" />}</div>
       {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
         <div className="pf-section">
           <div>
