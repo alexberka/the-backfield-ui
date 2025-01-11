@@ -581,6 +581,7 @@ body {
   .gamestream-field {
     position: relative;
     display: flex;
+    justify-content: space-evenly;
     width: 604px;
     height: 267px;
     /* border: 2px solid #45ff12; */
@@ -601,11 +602,21 @@ body {
       left: 50%;
       z-index: -2;
     }
+    .gsf-ball-on {
+      position: absolute;
+      height: 100%;
+      width: 0;
+      border: 1px solid greenyellow;
+      left: 50%;
+    }
     .gsf-yardline {
       height: 100%;
-      width: 50px;
-      border-left: 1px solid white;
-      z-index: -1;
+      width: 0px;
+      border: 1px solid white;
+      z-index: -2;
+    }
+    :nth-child(1 of .gsf-yardline), :nth-last-child(1 of .gsf-yardline) {
+      border: 1px solid greenyellow;
     }
     .gsf-home-team-endzone, .gsf-away-team-endzone {
       position: absolute;
@@ -613,7 +624,7 @@ body {
       height: 100%;
       width: 50px;
       background: linear-gradient();
-      z-index: 2;
+      z-index: -3;
       p {
         margin: 0 auto;
         height: 263px;

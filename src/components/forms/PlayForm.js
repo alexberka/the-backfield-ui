@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../utils/context/authContext';
-import { createPlay } from '../../api/playData';
+import { createPlay, deletePlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
 import { parsePlayerPossession, parsePossessionChanges } from '../../utils/statAnalysis';
@@ -399,6 +399,10 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     const reset = playEdit || initialState;
     setFormData(() => ({ ...reset, sessionKey: user.sessionKey, gameId }));
     setFormDisplay(initialDisplay);
+    setPlayerWithBall({});
+    setFumbleCreator(initialFumbleCreator);
+    setLateralCreator(initialLateralCreator);
+    setPenaltyCreator(initialPenaltyCreator);
   };
 
   const selectiveReset = (keys = []) => {
@@ -617,9 +621,17 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       createPlay(submitFormData).then(() => {
         onUpdate();
         allReset();
-        setNewPlay((prev) => !prev);
+        setNewPlay(false);
       });
     }
+  };
+
+  const handlePlayDelete = () => {
+    deletePlay(playEdit.prevPlayId, user.sessionKey).then(() => {
+      onUpdate();
+      allReset();
+      setNewPlay(false);
+    });
   };
 
   useEffect(() => {
@@ -656,6 +668,11 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           <button className="button" type="button" onClick={() => setNewPlay((prev) => !prev)}>
             Add Play
           </button>
+          {playEdit.prevPlayId !== -1 && (
+            <button className="button button-red" type="button" onClick={handlePlayDelete}>
+              Delete Last Play
+            </button>
+          )}
         </div>
       </div>
     );
@@ -1321,12 +1338,17 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         <button className="button" type="submit" disabled={!submitFormData}>
           Submit
         </button>
-        <button className="button button-red" type="button" onClick={allReset}>
-          Reset
-        </button>
         <button className="button" type="button" onClick={() => setNewPlay(false)}>
           Collapse Form
         </button>
+        <button className="button button-red" type="button" onClick={allReset}>
+          Reset Form
+        </button>
+        {playEdit.prevPlayId !== -1 && (
+          <button className="button button-red" type="button" onClick={handlePlayDelete}>
+            Delete Last Play
+          </button>
+        )}
       </div>
     </form>
   );

@@ -113,16 +113,22 @@ export default function GameStream({ gameStream }) {
         </div>
       </div>
       <div className="gamestream-field">
-        {gameStream.nextPlay.down > 0 && <div className="gsf-to-gain" style={{ left: 300 - 1 + gameStream.nextPlay.toGain * 5 }} />}
+        {gameStream.nextPlay.down > 0 && <div className="gsf-to-gain" style={{ left: 300 + gameStream.nextPlay.toGain * 5 }} />}
+        <div
+          className="gsf-ball-on"
+          style={{
+            left: 300 + gameStream.nextPlay.fieldPositionStart * 5,
+          }}
+        />
         <div
           className="gsf-drive"
           style={{
-            left: 300 - 1 + (gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.drivePositionStart : gameStream.drivePositionStart - gameStream.driveYards) * 5,
-            width: gameStream.driveYards * 5,
+            left: 300 + (gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.drivePositionStart : gameStream.drivePositionStart - gameStream.driveYards) * 5,
+            width: Math.max(gameStream.driveYards, 0) * 5,
             borderTop: `132px solid ${driveFillColor('top')}`,
-            borderRight: `${(gameStream.driveYards / 2) * 5}px solid ${driveFillColor('right')}`,
+            borderRight: `${(Math.max(gameStream.driveYards, 0) / 2) * 5}px solid ${driveFillColor('right')}`,
             borderBottom: `132px solid ${driveFillColor('bottom')}`,
-            borderLeft: `${(gameStream.driveYards / 2) * 5 + 1}px solid ${driveFillColor('left')}`,
+            borderLeft: `${(Math.max(gameStream.driveYards, 0) / 2) * 5}px solid ${driveFillColor('left')}`,
           }}
         />
         <div
@@ -133,7 +139,6 @@ export default function GameStream({ gameStream }) {
         >
           <p>{gameStream.homeTeam.nickname}</p>
         </div>
-        <div className="gsf-yardline" />
         <div className="gsf-yardline" />
         <div className="gsf-yardline" />
         <div className="gsf-yardline" />
