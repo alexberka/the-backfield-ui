@@ -7,8 +7,6 @@ import { getGameStream } from '../../../api/gameData';
 import GameStream from '../../../components/GameStream';
 import Loading from '../../../components/Loading';
 import { clientCredentials } from '../../../utils/client';
-// import connectToGamestream from '../../../api/websockets';
-// import connectToGamestream from '../../../api/websockets';
 
 export default function WatchGameStream({ params }) {
   const { gameId } = params;
