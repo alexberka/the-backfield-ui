@@ -106,6 +106,7 @@ const initialDisplay = {
   fakeToRush: false,
   twoPointPass: false,
   twoPointRush: false,
+  touchdown: false,
   lateralCreator: false,
   fumbleCreator: false,
   penaltyCreator: false,
@@ -156,7 +157,7 @@ const initialDisplay = {
 export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdit = initialState }) {
   const [newPlay, setNewPlay] = useState(false);
   const [formData, setFormData] = useState({});
-  const [submitFormData, setSubmitFormData] = useState(null);
+  const [validatedFormData, setValidatedFormData] = useState(initialState);
   const [formDisplay, setFormDisplay] = useState(initialDisplay);
   const { user } = useAuth();
   const [playerWithBall, setPlayerWithBall] = useState({});
@@ -198,6 +199,24 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     return {};
   };
 
+  const allReset = () => {
+    const reset = playEdit || initialState;
+    setFormData(() => ({ ...reset, sessionKey: user.sessionKey, gameId }));
+    setFormDisplay(initialDisplay);
+    setPlayerWithBall({});
+    setFumbleCreator(initialFumbleCreator);
+    setLateralCreator(initialLateralCreator);
+    setPenaltyCreator(initialPenaltyCreator);
+  };
+
+  const selectiveReset = (keys = []) => {
+    const resetValues = {};
+    keys.forEach((key) => {
+      resetValues[key] = playEdit[key] || initialState[key];
+    });
+    setFormData((prev) => ({ ...prev, ...resetValues }));
+  };
+
   const handleDisplay = (e = { target: { name: '' } }) => {
     const { name, value } = e.target;
     if (name === 'pass' || name === 'rush' || name === 'fieldGoal' || name === 'kickoff' || name === 'punt') {
@@ -215,7 +234,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.warn(name, value);
     if (Array.isArray(value)) {
       setFormData((prev) => ({
         ...prev,
@@ -237,6 +255,11 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         ...prev,
         [name]: value === 'null' ? null : value,
       }));
+    }
+    if (name === 'defensiveConversion') {
+      selectiveReset(['extraPointGood', 'conversionGood']);
+    } else if (name === 'conversionGood') {
+      selectiveReset(['defensiveConversion', 'extraPointGood']);
     }
   };
 
@@ -395,28 +418,12 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     }));
   };
 
-  const allReset = () => {
-    const reset = playEdit || initialState;
-    setFormData(() => ({ ...reset, sessionKey: user.sessionKey, gameId }));
-    setFormDisplay(initialDisplay);
-    setPlayerWithBall({});
-    setFumbleCreator(initialFumbleCreator);
-    setLateralCreator(initialLateralCreator);
-    setPenaltyCreator(initialPenaltyCreator);
-  };
+  const validateData = () => {
+    let findPlayer = true;
 
-  const selectiveReset = (keys = []) => {
-    const resetValues = {};
-    keys.forEach((key) => {
-      resetValues[key] = playEdit[key] || initialState[key];
-    });
-    setFormData((prev) => ({ ...prev, ...resetValues }));
-  };
-
-  const validateFormData = () => {
     // fieldPositionStart, teamId, gameId cannot be null
     if (formData.fieldPositionStart === null || formData.teamId === null || formData.gameId === null) {
-      return null;
+      findPlayer = false;
     }
 
     const updatedFormData = { ...formData };
@@ -446,7 +453,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     updatedFormData.kickFake = formDisplay.fakeToPass || formDisplay.fakeToRush;
     // Play can only contain one of kickoff, punt, or field goal
     if ((updatedFormData.kickoff && (updatedFormData.punt || updatedFormData.fieldGoal)) || (updatedFormData.punt && updatedFormData.fieldGoal)) {
-      return null;
+      findPlayer = false;
     }
     if (!updatedFormData.kickoff && !updatedFormData.punt && !updatedFormData.fieldGoal) {
       updatedFormData.kickerId = null;
@@ -480,20 +487,20 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       updatedFormData.kickBlockRecoveredAt = null;
     }
     if (updatedFormData.kickGood && (updatedFormData.kickBlocked || updatedFormData.kickFake)) {
-      return null;
+      findPlayer = false;
     }
     if (updatedFormData.kickoff || updatedFormData.fieldGoal || updatedFormData.punt) {
       if (updatedFormData.kickerId === null) {
-        return null;
+        findPlayer = false;
       }
       if (!updatedFormData.kickFake && (updatedFormData.passerId || updatedFormData.rusherId)) {
-        return null;
+        findPlayer = false;
       }
     }
 
     // Non-kickoffs must have down and to gain lines, kickoffs must not
     if (!updatedFormData.kickoff && (updatedFormData.down === 0 || updatedFormData.toGain === null)) {
-      return null;
+      findPlayer = false;
     }
     if (updatedFormData.kickoff) {
       updatedFormData.down = 0;
@@ -502,10 +509,10 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
     // toGain must be beyond fieldPositionStart line for both teams
     if (updatedFormData.teamId === homeTeam.id && updatedFormData?.toGain < updatedFormData.fieldPositionStart) {
-      return null;
+      findPlayer = false;
     }
     if (updatedFormData.teamId === awayTeam.id && updatedFormData?.toGain > updatedFormData.fieldPositionStart) {
-      return null;
+      findPlayer = false;
     }
 
     // fieldPositionEnd is set to goalline on made field goals and touchbacks
@@ -522,28 +529,44 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart;
     }
     if (updatedFormData.fieldPositionEnd === null) {
-      return null;
+      findPlayer = false;
     }
 
     // A play cannot be both a pass and a rush
     if (updatedFormData.passerId !== null && updatedFormData.rusherId !== null) {
-      return null;
+      findPlayer = false;
     }
 
     if (updatedFormData.passerId !== null) {
       // A complete pass must have a receiver, and cannot have interception data or pass defenders
       if (updatedFormData.completion && (updatedFormData.receiverId === null || updatedFormData.interceptedById !== null || updatedFormData.interceptedAt !== null || updatedFormData.passDefenderIds.length !== 0)) {
-        return null;
+        findPlayer = false;
       }
     }
 
-    // Update touchdown, safety information if a play ends in either endzone
-    if (!updatedFormData.kickGood && ((playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === -50))) {
-      updatedFormData.touchdownPlayerId = playerWithBall.id;
-      updatedFormData.conversion = formDisplay.twoPointPass || formDisplay.twoPointRush;
-      if (updatedFormData.extraPoint && updatedFormData.conversion && !updatedFormData.extraPointFake) {
-        return null;
-      }
+    // Evaluate possession chain for validity
+    const possessionChanges = parsePossessionChanges(updatedFormData);
+    const possessionChains = possessionChanges.filter((chain) => chain.length > 0 && playerById(chain[0].ballTo).teamId === updatedFormData.teamId);
+
+    // Form data is broken unless involving penalties
+    if (!possessionChains || (possessionChains.length === 0 && !formData.penalties.some((p) => p.enforced))) {
+      findPlayer = false;
+    }
+
+    // If at any point the validation has broken, reset the playerWithBall state and return initialState for validatedFormData
+    if (!findPlayer) {
+      setPlayerWithBall({});
+      return initialState;
+    }
+
+    // Retrieve and set playerWithBall at this point, in case the validation breaks in try analysis
+    const playerId = parsePlayerPossession(updatedFormData);
+    const possessionTeamId = playerById(playerId)?.teamId;
+    setPlayerWithBall(playerById(playerId));
+
+    // Only a touchdown if it's not a good field goal, and the play ends in the opponent's endzone (and user has marked as a touchdown)
+    if (!updatedFormData.kickGood && ((possessionTeamId === homeTeam.id && updatedFormData.fieldPositionEnd === 50) || (possessionTeamId === awayTeam.id && updatedFormData.fieldPositionEnd === -50)) && formDisplay.touchdown === true) {
+      updatedFormData.touchdownPlayerId = playerId;
       if (!updatedFormData.extraPoint) {
         updatedFormData.extraPointKickerId = null;
         updatedFormData.extraPointGood = false;
@@ -554,11 +577,11 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         updatedFormData.conversionReceiverId = null;
         updatedFormData.conversionRusherId = null;
         updatedFormData.conversionGood = false;
-        updatedFormData.defensiveConversion = false;
         updatedFormData.conversionReturnerId = null;
       }
-      if (updatedFormData.extraPointGood && updatedFormData.extraPointFake) {
-        return null;
+      // If the extra point attempt was a fake then it was a conversion attempt
+      if (updatedFormData.extraPointFake) {
+        updatedFormData.conversion = true;
       }
       if (!updatedFormData.conversion) {
         updatedFormData.extraPointFake = false;
@@ -574,14 +597,22 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       if (!formDisplay.twoPointRush) {
         updatedFormData.conversionRusherId = null;
       }
-      if (updatedFormData.conversionPasserId !== null && updatedFormData.conversionRusherId !== null) {
-        return null;
-      }
-      if ((updatedFormData.conversionGood || updatedFormData.extraPointGood) && updatedFormData.defensiveConversion) {
-        return null;
+      // A defensive conversion is only valid when
+      if (updatedFormData.extraPointGood || updatedFormData.conversionGood) {
+        updatedFormData.defensiveConversion = false;
       }
       if (!updatedFormData.defensiveConversion) {
         updatedFormData.conversionReturnerId = null;
+      }
+      // Return errors if try data is still invalid
+      if (updatedFormData.extraPoint && updatedFormData.conversion && !updatedFormData.extraPointFake) {
+        return initialState;
+      }
+      if (updatedFormData.conversionPasserId !== null && updatedFormData.conversionRusherId !== null) {
+        return initialState;
+      }
+      if ((updatedFormData.conversionGood || updatedFormData.extraPointGood) && updatedFormData.defensiveConversion) {
+        return initialState;
       }
     } else {
       updatedFormData.extraPoint = false;
@@ -596,20 +627,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       updatedFormData.defensiveConversion = false;
       updatedFormData.conversionReturnerId = null;
     }
-
-    if (!updatedFormData.kickTouchback && ((playerWithBall.teamId === awayTeam.id && updatedFormData.fieldPositionEnd === 50) || (playerWithBall.teamId === homeTeam.id && updatedFormData.fieldPositionEnd === -50))) {
+    // If play ends in team's own endzone and it is not a touchback, then it must be a safety
+    if (!updatedFormData.kickTouchback && ((possessionTeamId === awayTeam.id && updatedFormData.fieldPositionEnd === 50) || (possessionTeamId === homeTeam.id && updatedFormData.fieldPositionEnd === -50))) {
+      // Ceding player is last player with possession, which is id established in playerId variable
       updatedFormData.safety = true;
-      updatedFormData.cedingPlayerId = playerWithBall.id;
+      updatedFormData.cedingPlayerId = playerId;
     } else {
       updatedFormData.safety = false;
       updatedFormData.cedingPlayerId = null;
-    }
-
-    const possessionChanges = parsePossessionChanges(updatedFormData);
-    const possessionChains = possessionChanges.filter((chain) => chain.length > 0 && playerById(chain[0].ballTo).teamId === updatedFormData.teamId);
-
-    if (!possessionChains || (possessionChains.length === 0 && !formData.penalties.some((p) => p.enforced))) {
-      return null;
     }
 
     return updatedFormData;
@@ -617,8 +642,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (submitFormData) {
-      createPlay(submitFormData).then(() => {
+    if (validatedFormData) {
+      createPlay(validatedFormData).then(() => {
         onUpdate();
         allReset();
         setNewPlay(false);
@@ -646,14 +671,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   useEffect(() => {
     if (formData.teamId) {
-      const newFormData = validateFormData();
-      setSubmitFormData(newFormData);
-      if (newFormData !== null) {
-        const playerId = parsePlayerPossession(newFormData);
-        setPlayerWithBall(playerById(playerId));
-      } else {
-        setPlayerWithBall({});
-      }
+      const newFormData = validateData();
+      setValidatedFormData(newFormData);
     }
   }, [formData, formDisplay]);
 
@@ -769,6 +788,16 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           onChange={handleClockChange}
         />
         <input className="playform-timebox" name="clockEnd-seconds" type="number" min={!formData.clockEnd ? 0 : -1} max={formData.clockEnd < formData.clockStart ? 60 : (formData.clockStart || 0) % 60} value={formData.clockEnd === null ? '' : ((formData.clockEnd || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
+        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === -50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === 50)) && <p>Safety, +2 {playerWithBall.teamId === homeTeam.id ? `${awayTeam.locationName} ${awayTeam.nickname}` : `${homeTeam.locationName} ${homeTeam.nickname}`}!</p>}
+        {validatedFormData.touchdownPlayerId && (
+          <>
+            <p>
+              +{6 + (validatedFormData?.extraPointGood ? 1 : 0) + (validatedFormData?.conversionGood ? 2 : 0)} {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!
+            </p>
+            {validatedFormData?.defensiveConversion && <p>+2 {playerWithBall.teamId === awayTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
+          </>
+        )}
+        {validatedFormData.kickGood && <p>+3 {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
         {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formData.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
           <div>
             <div>
@@ -791,8 +820,128 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             </p>
           </div>
         )}
-        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === -50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === 50)) && <p>Safety {playerWithBall.teamId === homeTeam.id ? `${awayTeam.locationName} ${awayTeam.nickname}` : `${homeTeam.locationName} ${homeTeam.nickname}`}!</p>}
-        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && <p>Touchdown {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
+        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
+          <>
+            <label>
+              Touchdown?
+              <input
+                type="checkbox"
+                name="touchdown"
+                value={!formDisplay.touchdown}
+                checked={formDisplay.touchdown}
+                onChange={(e) => {
+                  handleDisplay(e);
+                }}
+              />
+            </label>
+            {formDisplay.touchdown && (
+              <div>
+                <div className="pf-touchdown-toggles">
+                  <label>
+                    <input
+                      type="radio"
+                      name="extraPoint"
+                      readOnly
+                      value={!formData.extraPoint}
+                      checked={formData.extraPoint}
+                      onClick={(e) => {
+                        if (e.target.value === 'true') {
+                          selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
+                        } else {
+                          selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
+                        }
+                        handleChange(e);
+                      }}
+                    />
+                    Extra Point
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="conversion"
+                      readOnly
+                      value={!formData.conversion}
+                      checked={formData.conversion}
+                      onClick={(e) => {
+                        if (e.target.value === 'true') {
+                          selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
+                        } else {
+                          selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
+                        }
+                        handleChange(e);
+                      }}
+                    />
+                    2pt Conversion
+                  </label>
+                </div>
+                {formData.extraPoint && (
+                  <div>
+                    <p>Kicker:</p>
+                    <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
+                    <label>
+                      Extra Point Good:
+                      <input type="checkbox" name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onChange={handleChange} />
+                    </label>
+                    {!formData.extraPointGood && (
+                      <label>
+                        Fake:
+                        <input type="checkbox" name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onChange={handleChange} />
+                      </label>
+                    )}
+                  </div>
+                )}
+                {(formData.conversion || formData.extraPointFake) && (
+                  <>
+                    <div className="pf-two-point-toggles">
+                      <label>
+                        <input type="radio" name="twoPointPass" readOnly value={!formDisplay.twoPointPass} checked={formDisplay.twoPointPass} onClick={handleDisplay} />
+                        Pass
+                      </label>
+                      <label>
+                        <input type="radio" name="twoPointRush" readOnly value={!formDisplay.twoPointRush} checked={formDisplay.twoPointRush} onClick={handleDisplay} />
+                        Rush
+                      </label>
+                    </div>
+                    <div>
+                      {formDisplay.twoPointPass && (
+                        <>
+                          <p>Passer:</p>
+                          <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
+                          <p>Receiver:</p>
+                          <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
+                        </>
+                      )}
+                      {formDisplay.twoPointRush && (
+                        <>
+                          <p>Rusher:</p>
+                          <PlayerSelect name="conversionRusherId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionRusherId || 'null'} />
+                        </>
+                      )}
+                      <label>
+                        Conversion Good:
+                        <input type="checkbox" name="conversionGood" value={!formData.conversionGood} checked={formData.conversionGood} onChange={handleChange} />
+                      </label>
+                    </div>
+                  </>
+                )}
+                {(formData.extraPoint || formData.conversion) && !formData.extraPointGood && !formData.conversionGood && (
+                  <div>
+                    <label>
+                      Defensive Conversion:
+                      <input type="checkbox" name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onChange={handleChange} />
+                    </label>
+                    {formData.defensiveConversion && (
+                      <>
+                        <p>Returned by</p>
+                        <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
       </div>
       <div className="playform-type-radios">
         <label>
@@ -1148,114 +1297,6 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         </div>
       </div>
       <div className="pf-section">{!playerWithBall.id ? <PlayerMultiSelect name="tacklerIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" /> : <PlayerMultiSelect name="tacklerIds" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.tacklerIds} header="Tacklers" />}</div>
-      {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
-        <div className="pf-section">
-          <div>
-            <div className="pf-touchdown-toggles">
-              <label>
-                <input
-                  type="radio"
-                  name="extraPoint"
-                  readOnly
-                  value={!formData.extraPoint}
-                  checked={formData.extraPoint}
-                  onClick={(e) => {
-                    if (e.target.value === 'true') {
-                      selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
-                    } else {
-                      selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
-                    }
-                    handleChange(e);
-                  }}
-                />
-                Extra Point
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="conversion"
-                  readOnly
-                  value={!formData.conversion}
-                  checked={formData.conversion}
-                  onClick={(e) => {
-                    if (e.target.value === 'true') {
-                      selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
-                    } else {
-                      selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
-                    }
-                    handleChange(e);
-                  }}
-                />
-                2pt Conversion
-              </label>
-            </div>
-            {formData.extraPoint && (
-              <div>
-                <p>Kicker:</p>
-                <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
-                <label>
-                  Extra Point Good:
-                  <input type="checkbox" name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onChange={handleChange} />
-                </label>
-                {!formData.extraPointGood && (
-                  <label>
-                    Fake:
-                    <input type="checkbox" name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onChange={handleChange} />
-                  </label>
-                )}
-              </div>
-            )}
-            {(formData.conversion || formData.extraPointFake) && (
-              <>
-                <div className="pf-two-point-toggles">
-                  <label>
-                    <input type="radio" name="twoPointPass" readOnly value={!formDisplay.twoPointPass} checked={formDisplay.twoPointPass} onClick={handleDisplay} />
-                    Pass
-                  </label>
-                  <label>
-                    <input type="radio" name="twoPointRush" readOnly value={!formDisplay.twoPointRush} checked={formDisplay.twoPointRush} onClick={handleDisplay} />
-                    Rush
-                  </label>
-                </div>
-                <div>
-                  {formDisplay.twoPointPass && (
-                    <>
-                      <p>Passer:</p>
-                      <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
-                      <p>Receiver:</p>
-                      <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
-                    </>
-                  )}
-                  {formDisplay.twoPointRush && (
-                    <>
-                      <p>Rusher:</p>
-                      <PlayerSelect name="conversionRusherId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionRusherId || 'null'} />
-                    </>
-                  )}
-                  <label>
-                    Conversion Good:
-                    <input type="checkbox" name="conversionGood" value={!formData.conversionGood} checked={formData.conversionGood} onChange={handleChange} />
-                  </label>
-                </div>
-              </>
-            )}
-          </div>
-          {(formData.extraPoint || formData.conversion) && !formData.conversionGood && (
-            <div>
-              <label>
-                Defensive Conversion:
-                <input type="checkbox" name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onChange={handleChange} />
-              </label>
-              {formData.defensiveConversion && (
-                <>
-                  <p>Returned by</p>
-                  <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      )}
       <div className="pf-section">
         <div className="pf-play-penalties">
           <div className="pf-creator-header">
@@ -1333,9 +1374,9 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         </div>
       </div>
-      {submitFormData === null && <div>Play is incomplete or illogical, double check form before submission</div>}
+      {validatedFormData.gameId === 0 && <div>Play is incomplete or illogical, double check form before submission</div>}
       <div className="pf-buttons">
-        <button className="button" type="submit" disabled={!submitFormData}>
+        <button className="button" type="submit" disabled={validatedFormData.gameId === 0}>
           Submit
         </button>
         <button className="button" type="button" onClick={() => setNewPlay(false)}>
