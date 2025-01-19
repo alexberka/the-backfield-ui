@@ -522,7 +522,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     if (updatedFormData.kickGood || updatedFormData.kickTouchback) {
       updatedFormData.fieldPositionEnd = 50 * (updatedFormData.teamId === homeTeam.id ? 1 : -1);
     }
-    if (updatedFormData.fieldGoal && !updatedFormData.kickGood && updatedFormData.kickBlockRecoveredAt === null && !updatedFormData.kickFake) {
+    if (updatedFormData.fieldGoal && !updatedFormData.kickGood && updatedFormData.kickBlockRecoveredById === null && updatedFormData.kickBlockRecoveredAt === null && !updatedFormData.kickFake) {
       updatedFormData.fieldPositionEnd = updatedFormData.fieldPositionStart + 7 * (updatedFormData.teamId === homeTeam.id ? -1 : 1);
     }
     if (updatedFormData.passerId !== null && !updatedFormData.completion && updatedFormData.tacklerIds.length === 0 && !formDisplay.interception) {
@@ -798,7 +798,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </>
         )}
         {validatedFormData.kickGood && <p>+3 {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
-        {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formData.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
+        {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formDisplay.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
           <div>
             <div>
               <i>Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 && !formDisplay.interception ? formData.fieldPositionStart : formData.fieldPositionEnd)}
