@@ -671,6 +671,85 @@ body {
   }
 }
 
+.stat-bar {
+  width: 100%;
+  text-align: center;
+  .stat-bar-interior-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    min-width: 604px;
+    margin: 0 auto;
+    border: 2px solid gray;
+    border-radius: 5px;
+    .stat-bar-section {
+      margin: 3px 0;
+      .stat-bar-section-title {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+        margin: 0;
+      }
+      .stat-bar-section-content {
+        height: auto;
+        min-height: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 3px;
+        .stat-bar-column {
+          min-width: 50%;
+        }
+        .stat-bar-column:first-of-type {
+          border-right: 2px solid gray;
+        }
+        .sb-header-item {
+          display: flex;
+          gap: 1px;
+          margin: 3px 8px;
+          justify-content: right;
+          font-size: 0.8rem;
+          .sbhi-player-name {
+            font-weight: bold;
+            text-align: left;
+            flex-grow: 1;
+          }
+          .sbhi-stat {
+            min-width: 50px;
+            text-align: right;
+            .sbhi-units {
+              margin-left: 3px;
+              font-size: 0.5rem;
+              color: greenyellow;
+              font-weight: bold;
+            }
+          }
+          .sbhi-stat.thin {
+            min-width: 35px;
+          }
+          .sbhi-stat.wide {
+            min-width: 70px;
+          }
+        }
+      }
+      .stat-bar-section-divider {
+        border-top: 2px solid gray;
+        opacity: 1;
+        margin: 0 3px;
+      }
+    }
+    .sb-expand {
+      font-size: 0.8rem;
+      background: none;
+      color: greenyellow;
+      border: none;
+      margin: 0 0 3px 0;
+    }
+    .sb-expand:hover {
+      font-weight: bold;
+    }
+  }
+}
+
 .play-segment {
   .play-segment-line {
     position: absolute;
