@@ -1,22 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import GameStreamField from './GameStreamField';
 
 export default function PlaySegment({ playSegment }) {
   return (
     <div className="play-segment">
       {playSegment.fieldEnd != null && (
-        <div className="gamestream-field" style={{ height: '40px' }}>
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
-          <div className="gsf-yardline" />
+        <GameStreamField slim>
           <div
             className="play-segment-line"
             style={{
@@ -30,7 +20,7 @@ export default function PlaySegment({ playSegment }) {
               left: 300 - 4 + playSegment.fieldEnd * 5,
             }}
           />
-        </div>
+        </GameStreamField>
       )}
       <p className="play-segment-text">{playSegment.segmentText}</p>
     </div>

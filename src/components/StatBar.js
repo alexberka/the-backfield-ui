@@ -76,6 +76,11 @@ StatBar.Ticker = function Ticker({ teamStats, lastPlay }) {
           <StatBar.Defender key={player.playerId} player={player} />
         ))}
       {teamStats
+        .filter((player) => lastPlay.fumbles.some((f) => [f.fumbleCommittedById, f.fumbleForcedById, f.fumbleRecoveredById].includes(player.playerId)))
+        .map((player) => (
+          <StatBar.Fumble key={player.playerId} player={player} />
+        ))}
+      {teamStats
         .filter((player) => player.playerId === lastPlay.extraPointKickerId)
         .map((player) => (
           <StatBar.Kicker key={player.playerId} player={player} />
@@ -100,6 +105,13 @@ StatBar.Ticker.propTypes = {
     tacklerIds: PropTypes.arrayOf(PropTypes.number),
     interceptedById: PropTypes.number,
     extraPointKickerId: PropTypes.number,
+    fumbles: PropTypes.arrayOf(
+      PropTypes.shape({
+        fumbleCommittedById: PropTypes.number,
+        fumbleForcedById: PropTypes.number,
+        fumbleRecoveredById: PropTypes.number,
+      }),
+    ),
   }).isRequired,
 };
 
@@ -361,5 +373,39 @@ StatBar.Returner.propTypes = {
     kickoffReturnYards: PropTypes.number,
     puntReturns: PropTypes.number,
     puntReturnYards: PropTypes.number,
+  }).isRequired,
+};
+
+StatBar.Fumble = function Fumble({ player }) {
+  return (
+    <div className="sb-header-item">
+      <span className="sbhi-player-name">
+        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
+      </span>
+      <span className="sbhi-stat thin">
+        {player.fumblesCommitted}
+        <span className="sbhi-units">FUM</span>
+      </span>
+      <span className="sbhi-stat thin">
+        {player.fumblesForced}
+        <span className="sbhi-units">FF</span>
+      </span>
+      <span className="sbhi-stat thin">
+        {player.fumblesRecovered}
+        <span className="sbhi-units">FR</span>
+      </span>
+    </div>
+  );
+};
+
+StatBar.Fumble.propTypes = {
+  player: PropTypes.shape({
+    playerInfo: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+    }),
+    fumblesCommitted: PropTypes.number,
+    fumblesForced: PropTypes.number,
+    fumblesRecovered: PropTypes.number,
   }).isRequired,
 };
