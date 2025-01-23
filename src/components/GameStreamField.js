@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useGameStream } from '../utils/context/gameStreamContext.js';
 
-export default function GameStreamField({ slim = false, drive = false, toGain = false, ballOn = false }) {
+export default function GameStreamField({ children, slim = false, drive = false, toGain = false, ballOn = false }) {
   const gameStream = useGameStream();
 
   const driveFillColor = (edge) => {
@@ -93,11 +93,13 @@ export default function GameStreamField({ slim = false, drive = false, toGain = 
       >
         {!slim && <p>{gameStream.awayTeam.nickname}</p>}
       </div>
+      {children}
     </div>
   );
 }
 
 GameStreamField.propTypes = {
+  children: PropTypes.node,
   slim: PropTypes.bool,
   drive: PropTypes.bool,
   toGain: PropTypes.bool,

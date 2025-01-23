@@ -82,30 +82,30 @@ export default function GameStream({ gameStream }) {
       </div>
       <GameStreamProvider gameStream={gameStream}>
         <GameStreamField drive slim={expandedStats} toGain ballOn />
+        {gameStream.lastPlay !== null && (
+          <div className="gs-last-play">
+            <div className="gs-last-play-header">
+              <p className="gs-last-play-text">Last Play:</p>
+              {gameStream.lastPlay.down > 0 && (
+                <>
+                  <p className="gs-last-play-down">
+                    {gameStream.lastPlay.down === 1 && '1st '}
+                    {gameStream.lastPlay.down === 2 && '2nd '}
+                    {gameStream.lastPlay.down === 3 && '3rd '}
+                    {gameStream.lastPlay.down === 4 && '4th '}& {Math.abs(gameStream.lastPlay.toGain) === 50 ? 'Goal' : (gameStream.lastPlay.toGain - gameStream.lastPlay.fieldPositionStart) * (gameStream.lastPlay.teamId === gameStream.awayTeam.id ? -1 : 1)}
+                  </p>
+                  <p className="gs-last-play-field-position">on {fieldPositionToString(gameStream.lastPlay.fieldPositionStart)}</p>
+                </>
+              )}
+            </div>
+            <div className="play-segments-container">
+              {gameStream.lastPlay.playSegments.map((ps) => (
+                <PlaySegment key={ps.index} playSegment={ps} />
+              ))}
+            </div>
+          </div>
+        )}
       </GameStreamProvider>
-      {gameStream.lastPlay !== null && (
-        <div className="gs-last-play">
-          <div className="gs-last-play-header">
-            <p className="gs-last-play-text">Last Play:</p>
-            {gameStream.lastPlay.down > 0 && (
-              <>
-                <p className="gs-last-play-down">
-                  {gameStream.lastPlay.down === 1 && '1st '}
-                  {gameStream.lastPlay.down === 2 && '2nd '}
-                  {gameStream.lastPlay.down === 3 && '3rd '}
-                  {gameStream.lastPlay.down === 4 && '4th '}& {Math.abs(gameStream.lastPlay.toGain) === 50 ? 'Goal' : (gameStream.lastPlay.toGain - gameStream.lastPlay.fieldPositionStart) * (gameStream.lastPlay.teamId === gameStream.awayTeam.id ? -1 : 1)}
-                </p>
-                <p className="gs-last-play-field-position">on {fieldPositionToString(gameStream.lastPlay.fieldPositionStart)}</p>
-              </>
-            )}
-          </div>
-          <div className="play-segments-container">
-            {gameStream.lastPlay.playSegments.map((ps) => (
-              <PlaySegment key={ps.index} playSegment={ps} />
-            ))}
-          </div>
-        </div>
-      )}
       <StatBar homeTeamStats={gameStream.homeTeamPlayerStats} awayTeamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay}>
         {expandedStats && (
           <>

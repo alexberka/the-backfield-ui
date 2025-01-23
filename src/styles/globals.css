@@ -765,9 +765,11 @@ body {
         .sb-header-item {
           display: flex;
           gap: 1px;
-          margin: 3px 8px;
+          margin: 3px 8px 0;
+          padding-bottom: 2px;
           justify-content: right;
           font-size: 0.8rem;
+          border-bottom: 1px solid rgba(172, 255, 47, 0.696);
           .sbhi-player-name {
             font-weight: bold;
             text-align: left;
@@ -789,6 +791,9 @@ body {
           .sbhi-stat.wide {
             min-width: 70px;
           }
+        }
+        .sb-header-item:last-of-type {
+          border: none;
         }
       }
       .stat-bar-section-divider {
