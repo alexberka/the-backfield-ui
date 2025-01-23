@@ -62,9 +62,8 @@ StatBar.Ticker = function Ticker({ teamStats, lastPlay }) {
         .map((player) => {
           if (lastPlay.punt) {
             return <StatBar.Punter key={player.playerId} player={player} />;
-          } 
-            return <StatBar.Kicker key={player.playerId} player={player} />;
-          
+          }
+          return <StatBar.Kicker key={player.playerId} player={player} />;
         })}
       {teamStats
         .filter((player) => player.playerId === lastPlay.kickReturnerId)
@@ -264,15 +263,15 @@ StatBar.Kicker = function Kicker({ player }) {
         {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
       </span>
       <span className="sbhi-stat">
-        {player.fieldGoalAttempts}
-        <span style={{ color: 'greenyellow' }}>/</span>
         {player.fieldGoalsMade}
+        <span style={{ color: 'greenyellow' }}>/</span>
+        {player.fieldGoalAttempts}
         <span className="sbhi-units">FG</span>
       </span>
       <span className="sbhi-stat">
-        {player.extraPointAttempts}
-        <span style={{ color: 'greenyellow' }}>/</span>
         {player.extraPointsMade}
+        <span style={{ color: 'greenyellow' }}>/</span>
+        {player.extraPointAttempts}
         <span className="sbhi-units">XP</span>
       </span>
     </div>
