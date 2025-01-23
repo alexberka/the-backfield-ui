@@ -104,29 +104,4 @@ GameStreamField.propTypes = {
   drive: PropTypes.bool,
   toGain: PropTypes.bool,
   ballOn: PropTypes.bool,
-  playSegment: PropTypes.shape({
-    index: PropTypes.number,
-    fieldStart: PropTypes.number,
-    fieldEnd: PropTypes.number,
-    teamId: PropTypes.number,
-    segmentText: PropTypes.string,
-    lineType: PropTypes.string,
-    endpointType: PropTypes.string,
-  }).isRequired,
 };
-
-// GameStreamField.Drive = function Drive () {
-//   return (
-//     <div
-//           className="gsf-drive"
-//           style={{
-//             left: 300 + (gameStream.nextPlay.teamId === gameStream.homeTeam.id ? gameStream.drivePositionStart : gameStream.drivePositionStart - gameStream.driveYards) * 5,
-//             width: Math.max(gameStream.driveYards, 0) * 5,
-//             borderTop: `132px solid ${driveFillColor('top')}`,
-//             borderRight: `${(Math.max(gameStream.driveYards, 0) / 2) * 5}px solid ${driveFillColor('right')}`,
-//             borderBottom: `132px solid ${driveFillColor('bottom')}`,
-//             borderLeft: `${(Math.max(gameStream.driveYards, 0) / 2) * 5}px solid ${driveFillColor('left')}`,
-//           }}
-//         />
-//   )
-// }
