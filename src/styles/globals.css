@@ -577,6 +577,17 @@ body {
         font-weight: bold;
       }
     }
+    .gsdi-upper {
+      position: relative;
+      top: 0;
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      p, h4 {
+        width: auto;
+        margin: 0 10px;
+      }
+    }
   }
   .gamestream-field {
     position: relative;
@@ -647,6 +658,9 @@ body {
         transform: rotate(-180deg);
       }
     }
+  }
+  .gsf-slim {
+    height: 40px;
   }
   .gs-last-play {
     width: 800px;
