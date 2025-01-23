@@ -186,7 +186,25 @@ export default function GameStream({ gameStream }) {
         </div>
       )}
       <StatBar homeTeamStats={gameStream.homeTeamPlayerStats} awayTeamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay}>
-        <StatBar.Section>
+        {expandedStats && (
+          <>
+            <div className="sbtn-container sbtn-home">
+              <div className="primary-color-bar" style={{ borderColor: gameStream.homeTeam.colorPrimaryHex }} />
+              <div className="secondary-color-bar" style={{ borderColor: gameStream.homeTeam.colorSecondaryHex }} />
+              <span className="stat-bar-team-name">
+                {gameStream.homeTeam.locationName} <span className="sbtn-nick">{gameStream.homeTeam.nickname}</span>
+              </span>
+            </div>
+            <div className="sbtn-container sbtn-away">
+              <div className="primary-color-bar" style={{ borderColor: gameStream.awayTeam.colorPrimaryHex }} />
+              <div className="secondary-color-bar" style={{ borderColor: gameStream.awayTeam.colorSecondaryHex }} />
+              <span className="stat-bar-team-name">
+                {gameStream.awayTeam.locationName} <span className="sbtn-nick">{gameStream.awayTeam.nickname}</span>
+              </span>
+            </div>
+          </>
+        )}
+        <StatBar.Section title={expandedStats && 'Last Play'}>
           <StatBar.Column>
             <StatBar.Ticker teamStats={gameStream.homeTeamPlayerStats} lastPlay={gameStream.lastPlay} />
           </StatBar.Column>
@@ -230,6 +248,7 @@ export default function GameStream({ gameStream }) {
               <StatBar.Column>
                 {gameStream.awayTeamPlayerStats
                   .filter((player) => player.receivingTargets !== 0 || player.receivingYards !== 0)
+                  .sort((a, b) => b.receptions - a.receptions)
                   .sort((a, b) => b.receivingYards - a.receivingYards)
                   .map((player) => (
                     <StatBar.Receiver player={player} key={player.id} />
@@ -332,6 +351,9 @@ export default function GameStream({ gameStream }) {
                   ))}
               </StatBar.Column>
             </StatBar.Section>
+            <button type="button" className="sb-expand" onClick={() => setExpandedStats(false)}>
+              Collapse Stats
+            </button>
           </>
         )}
       </StatBar>

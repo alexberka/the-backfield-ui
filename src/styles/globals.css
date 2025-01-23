@@ -682,6 +682,52 @@ body {
     margin: 0 auto;
     border: 2px solid gray;
     border-radius: 5px;
+    .sbtn-container {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 50px;
+      pointer-events: none;
+      .primary-color-bar, .secondary-color-bar {
+        position: absolute;
+        writing-mode: vertical-lr;
+        border: 1px solid gray;
+        height: 100%;
+      }
+      .stat-bar-team-name {
+        position: sticky;
+        display: block;
+        top: 15px;
+        font-size: 2rem;
+        font-weight: bold;
+        width: 100%;
+        writing-mode: vertical-rl;
+        .sbtn-nick {
+          color: greenyellow;
+        }
+      }
+    }
+    .sbtn-home {
+      left: -3rem;
+      .stat-bar-team-name {
+        transform: rotate(-180deg);
+      }
+      .primary-color-bar {
+        left: 0;
+      }
+      .secondary-color-bar {
+        left: -1rem;
+      }
+    }
+    .sbtn-away {
+      right: -3rem;
+      .primary-color-bar {
+        right: 0;
+      }
+      .secondary-color-bar {
+        right: -1rem;
+      }
+    }
     .stat-bar-section {
       margin: 3px 0;
       .stat-bar-section-title {
