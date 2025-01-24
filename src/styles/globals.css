@@ -751,6 +751,7 @@ body {
         margin: 0;
       }
       .stat-bar-section-content {
+        position: relative;
         height: auto;
         min-height: 20px;
         display: grid;
@@ -758,42 +759,65 @@ body {
         margin-bottom: 3px;
         .stat-bar-column {
           min-width: 50%;
-        }
-        .stat-bar-column:first-of-type {
-          border-right: 2px solid gray;
-        }
-        .sb-header-item {
-          display: flex;
-          gap: 1px;
-          margin: 3px 8px 0;
-          padding-bottom: 2px;
-          justify-content: right;
+          display: grid;
           font-size: 0.8rem;
-          border-bottom: 1px solid rgba(172, 255, 47, 0.696);
-          .sbhi-player-name {
+          /* Number of repeated columns indicates max number of stats per row of the grid, (first column auto is the player name)
+          Can be increased as needed as long as .sbli-stat.last is increased accordingly (repeated columns + 2) */
+          grid-template-columns: auto repeat(10, max-content);
+          padding: 0 6px;
+          margin-bottom: auto;
+          .sbli-player-name {
             font-weight: bold;
             text-align: left;
-            flex-grow: 1;
+            margin: 0 auto;
+            width: 100%;
+            padding-right: 4px;
           }
-          .sbhi-stat {
-            min-width: 50px;
+          .sbli-player-number {
+            margin-left: 3px;
+            font-size: 0.6rem;
+            color: greenyellow;
+            font-weight: bold;
+          }
+          .sbli-stat {
             text-align: right;
-            .sbhi-units {
-              margin-left: 3px;
-              font-size: 0.5rem;
-              color: greenyellow;
-              font-weight: bold;
-            }
+            margin-left: 8px;
           }
-          .sbhi-stat.thin {
-            min-width: 35px;
+          .sbli-stat.last {
+            /* Value should be two more than the number of repeated columns in .stat-bar-column */
+            grid-column-end: 12;
           }
-          .sbhi-stat.wide {
-            min-width: 70px;
+          .sbli-ratio-slash {
+            color: greenyellow;
+          }
+          .sbli-units {
+            margin-left: 3px;
+            font-size: 0.5rem;
+            color: greenyellow;
+            font-weight: bold;
+          }
+          .sbli-hr {
+            grid-column: 1 / 12;
+            border-bottom: 1px solid rgba(172, 255, 47, 0.629);
+            margin: 1px 0;
+          }
+          .sbli-hr:last-of-type {
+            display: none;
           }
         }
-        .sb-header-item:last-of-type {
-          border: none;
+        .stat-bar-column.ticker {
+          width: 100%;
+          padding: 0;
+          .sbli-hr {
+            display: none;
+          }
+        }
+        .stat-bar-vertical-divider {
+          position: absolute;
+          width: 0;
+          border: 1px solid gray;
+          left: calc(50% - 1px);
+          height: 100%;
         }
       }
       .stat-bar-section-divider {

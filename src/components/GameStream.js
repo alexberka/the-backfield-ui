@@ -134,7 +134,7 @@ export default function GameStream({ gameStream }) {
           </StatBar.Column>
         </StatBar.Section>
         <button type="button" className="sb-expand" onClick={() => setExpandedStats((prev) => !prev)}>
-          {expandedStats ? 'Collapse Stats' : 'Expand Stats'}
+          {expandedStats ? '- Collapse Stats -' : '- Expand Stats -'}
         </button>
         {expandedStats && (
           <>
@@ -273,7 +273,7 @@ export default function GameStream({ gameStream }) {
               </StatBar.Column>
             </StatBar.Section>
             <button type="button" className="sb-expand" onClick={() => setExpandedStats(false)}>
-              Collapse Stats
+              - Collapse Stats -
             </button>
           </>
         )}

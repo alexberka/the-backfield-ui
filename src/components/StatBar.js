@@ -19,7 +19,10 @@ StatBar.Section = function Section({ title = '', divider = true, children }) {
   return (
     <div className="stat-bar-section">
       {title !== '' && <p className="stat-bar-section-title">{title}</p>}
-      <div className="stat-bar-section-content">{children}</div>
+      <div className="stat-bar-section-content">
+        {children}
+        <div className="stat-bar-vertical-divider" />
+      </div>
       {divider && <hr className="stat-bar-section-divider" />}
     </div>
   );
@@ -41,51 +44,67 @@ StatBar.Column.propTypes = {
 
 StatBar.Ticker = function Ticker({ teamStats, lastPlay }) {
   return (
-    <>
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.passerId)
-        .map((player) => (
-          <StatBar.Passer key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.receiverId)
-        .map((player) => (
-          <StatBar.Receiver key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.rusherId)
-        .map((player) => (
-          <StatBar.Rusher key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.kickerId)
-        .map((player) => {
-          if (lastPlay.punt) {
-            return <StatBar.Punter key={player.playerId} player={player} />;
-          }
-          return <StatBar.Kicker key={player.playerId} player={player} />;
-        })}
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.kickReturnerId)
-        .map((player) => (
-          <StatBar.Returner key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => lastPlay.tacklerIds.includes(player.playerId) || lastPlay.interceptedById === player.playerId)
-        .map((player) => (
-          <StatBar.Defender key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => lastPlay.fumbles.some((f) => [f.fumbleCommittedById, f.fumbleForcedById, f.fumbleRecoveredById].includes(player.playerId)))
-        .map((player) => (
-          <StatBar.Fumble key={player.playerId} player={player} />
-        ))}
-      {teamStats
-        .filter((player) => player.playerId === lastPlay.extraPointKickerId)
-        .map((player) => (
-          <StatBar.Kicker key={player.playerId} player={player} />
-        ))}
-    </>
+    <div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.passerId)
+          .map((player) => (
+            <StatBar.Passer key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.receiverId)
+          .map((player) => (
+            <StatBar.Receiver key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.rusherId)
+          .map((player) => (
+            <StatBar.Rusher key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.kickerId)
+          .map((player) => {
+            if (lastPlay.punt) {
+              return <StatBar.Punter key={player.playerId} player={player} />;
+            }
+            return <StatBar.Kicker key={player.playerId} player={player} />;
+          })}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.kickReturnerId)
+          .map((player) => (
+            <StatBar.Returner key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => lastPlay.tacklerIds.includes(player.playerId) || lastPlay.interceptedById === player.playerId)
+          .map((player) => (
+            <StatBar.Defender key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => lastPlay.fumbles.some((f) => [f.fumbleCommittedById, f.fumbleForcedById, f.fumbleRecoveredById].includes(player.playerId)))
+          .map((player) => (
+            <StatBar.Fumble key={player.playerId} player={player} />
+          ))}
+      </div>
+      <div className="stat-bar-column ticker">
+        {teamStats
+          .filter((player) => player.playerId === lastPlay.extraPointKickerId)
+          .map((player) => (
+            <StatBar.Kicker key={player.playerId} player={player} />
+          ))}
+      </div>
+    </div>
   );
 };
 
@@ -117,29 +136,28 @@ StatBar.Ticker.propTypes = {
 
 StatBar.Passer = function Passer({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat wide">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.passCompletions}
-        <span style={{ color: 'greenyellow' }}>/</span>
+        <span className="sbli-ratio-slash">/</span>
         {player.passAttempts}
-        <span className="sbhi-units">PASS</span>
+        <span className="sbli-units">PASS</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.passYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat">
         {player.passTouchdowns}
-        <span className="sbhi-units">TD</span>
+        <span className="sbli-units">TD</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat last">
         {player.interceptionsThrown}
-        <span className="sbhi-units">INT</span>
+        <span className="sbli-units">INT</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -148,6 +166,7 @@ StatBar.Passer.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     passAttempts: PropTypes.number,
     passCompletions: PropTypes.number,
@@ -159,25 +178,24 @@ StatBar.Passer.propTypes = {
 
 StatBar.Receiver = function Receiver({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat wide">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.receptions}
-        <span style={{ color: 'greenyellow' }}>/</span>
+        <span className="sbli-ratio-slash">/</span>
         {player.receivingTargets}
-        <span className="sbhi-units">REC</span>
+        <span className="sbli-units">REC</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.receivingYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat last">
         {player.receivingTouchdowns}
-        <span className="sbhi-units">TD</span>
+        <span className="sbli-units">TD</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -186,6 +204,7 @@ StatBar.Receiver.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     receptions: PropTypes.number,
     receivingTargets: PropTypes.number,
@@ -196,23 +215,22 @@ StatBar.Receiver.propTypes = {
 
 StatBar.Rusher = function Rusher({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.rushAttempts}
-        <span className="sbhi-units">RUSH</span>
+        <span className="sbli-units">RUSH</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.rushYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat last">
         {player.rushTouchdowns}
-        <span className="sbhi-units">TD</span>
+        <span className="sbli-units">TD</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -221,6 +239,7 @@ StatBar.Rusher.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     rushAttempts: PropTypes.number,
     rushYards: PropTypes.number,
@@ -230,27 +249,26 @@ StatBar.Rusher.propTypes = {
 
 StatBar.Defender = function Defender({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.tackles}
-        <span className="sbhi-units">TCKL</span>
+        <span className="sbli-units">TCKL</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.sacks}
-        <span className="sbhi-units">SACK</span>
+        <span className="sbli-units">SACK</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat">
         {player.interceptionsReceived}
-        <span className="sbhi-units">INT</span>
+        <span className="sbli-units">INT</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat last">
         {player.interceptionReturnTouchdowns + player.fumbleReturnTouchdowns}
-        <span className="sbhi-units">TD</span>
+        <span className="sbli-units">TD</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -259,6 +277,7 @@ StatBar.Defender.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     tackles: PropTypes.number,
     sacks: PropTypes.number,
@@ -270,23 +289,22 @@ StatBar.Defender.propTypes = {
 
 StatBar.Kicker = function Kicker({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.fieldGoalsMade}
-        <span style={{ color: 'greenyellow' }}>/</span>
+        <span className="sbli-ratio-slash">/</span>
         {player.fieldGoalAttempts}
-        <span className="sbhi-units">FG</span>
+        <span className="sbli-units">FG</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat last">
         {player.extraPointsMade}
-        <span style={{ color: 'greenyellow' }}>/</span>
+        <span className="sbli-ratio-slash">/</span>
         {player.extraPointAttempts}
-        <span className="sbhi-units">XP</span>
+        <span className="sbli-units">XP</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -295,6 +313,7 @@ StatBar.Kicker.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     fieldGoalAttempts: PropTypes.number,
     fieldGoalsMade: PropTypes.number,
@@ -305,23 +324,22 @@ StatBar.Kicker.propTypes = {
 
 StatBar.Punter = function Punter({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.punts}
-        <span className="sbhi-units">PUNT</span>
+        <span className="sbli-units">PUNT</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.puntYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-      <span className="sbhi-stat wide">
+      <span className="sbli-stat last">
         {player.averagePuntYards.toFixed(1)}
-        <span className="sbhi-units">AVG</span>
+        <span className="sbli-units">AVG</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -330,6 +348,7 @@ StatBar.Punter.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     punts: PropTypes.number,
     puntYards: PropTypes.number,
@@ -339,27 +358,26 @@ StatBar.Punter.propTypes = {
 
 StatBar.Returner = function Returner({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat wide">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">
         {player.puntReturns}
-        <span className="sbhi-units">PUNT RET</span>
+        <span className="sbli-units">PUNT RET</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat">
         {player.puntReturnYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-      <span className="sbhi-stat wide">
+      <span className="sbli-stat">
         {player.kickoffReturns}
-        <span className="sbhi-units">KICK RET</span>
+        <span className="sbli-units">KICK RET</span>
       </span>
-      <span className="sbhi-stat">
+      <span className="sbli-stat last">
         {player.kickoffReturnYards}
-        <span className="sbhi-units">YDS</span>
+        <span className="sbli-units">YDS</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
@@ -368,6 +386,7 @@ StatBar.Returner.propTypes = {
     playerInfo: PropTypes.shape({
       firstName: PropTypes.string,
       lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
     }),
     kickoffReturns: PropTypes.number,
     kickoffReturnYards: PropTypes.number,
@@ -378,34 +397,45 @@ StatBar.Returner.propTypes = {
 
 StatBar.Fumble = function Fumble({ player }) {
   return (
-    <div className="sb-header-item">
-      <span className="sbhi-player-name">
-        {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
-      </span>
-      <span className="sbhi-stat thin">
-        {player.fumblesCommitted}
-        <span className="sbhi-units">FUM</span>
-      </span>
-      <span className="sbhi-stat thin">
+    <>
+      <StatBar.PlayerName playerInfo={player.playerInfo} />
+      <span className="sbli-stat">{player.fumblesCommitted}</span>
+      <span className="sbli-units">FUM</span>
+      <span className="sbli-stat">
         {player.fumblesForced}
-        <span className="sbhi-units">FF</span>
+        <span className="sbli-units">FF</span>
       </span>
-      <span className="sbhi-stat thin">
+      <span className="sbli-stat last">
         {player.fumblesRecovered}
-        <span className="sbhi-units">FR</span>
+        <span className="sbli-units">FR</span>
       </span>
-    </div>
+      <div className="sbli-hr" />
+    </>
   );
 };
 
 StatBar.Fumble.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-    }),
+    playerInfo: PropTypes.shape,
     fumblesCommitted: PropTypes.number,
     fumblesForced: PropTypes.number,
     fumblesRecovered: PropTypes.number,
+  }).isRequired,
+};
+
+StatBar.PlayerName = function PlayerName({ playerInfo }) {
+  return (
+    <span className="sbli-player-name">
+      {playerInfo.firstName[0]}. {playerInfo.lastName}
+      {playerInfo.jerseyNumber >= 0 && <span className="sbli-player-number">#{playerInfo.jerseyNumber}</span>}
+    </span>
+  );
+};
+
+StatBar.PlayerName.propTypes = {
+  playerInfo: PropTypes.shape({
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    jerseyNumber: PropTypes.number,
   }).isRequired,
 };
