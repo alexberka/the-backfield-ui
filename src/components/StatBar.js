@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import FullStatsModal from './modals/FullStatsModals';
+import FullStatsModal from './modals/FullStatsModal';
 import Stat from './Stat';
 
 export default function StatBar({ children }) {
