@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useGameStream } from '../utils/context/gameStreamContext.js';
+import { useGameStream } from '../utils/context/gameStreamContext';
 
 export default function GameStreamField({ children, slim = false, drive = false, toGain = false, ballOn = false }) {
   const gameStream = useGameStream();

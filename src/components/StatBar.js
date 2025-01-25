@@ -163,11 +163,7 @@ StatBar.Passer = function Passer({ player }) {
 
 StatBar.Passer.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     passAttempts: PropTypes.number,
     passCompletions: PropTypes.number,
     passYards: PropTypes.number,
@@ -201,11 +197,7 @@ StatBar.Receiver = function Receiver({ player }) {
 
 StatBar.Receiver.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     receptions: PropTypes.number,
     receivingTargets: PropTypes.number,
     receivingYards: PropTypes.number,
@@ -236,11 +228,7 @@ StatBar.Rusher = function Rusher({ player }) {
 
 StatBar.Rusher.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     rushAttempts: PropTypes.number,
     rushYards: PropTypes.number,
     rushTouchdowns: PropTypes.number,
@@ -274,11 +262,7 @@ StatBar.Defender = function Defender({ player }) {
 
 StatBar.Defender.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     tackles: PropTypes.number,
     sacks: PropTypes.number,
     interceptionsReceived: PropTypes.number,
@@ -310,11 +294,7 @@ StatBar.Kicker = function Kicker({ player }) {
 
 StatBar.Kicker.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     fieldGoalAttempts: PropTypes.number,
     fieldGoalsMade: PropTypes.number,
     extraPointAttempts: PropTypes.number,
@@ -345,11 +325,7 @@ StatBar.Punter = function Punter({ player }) {
 
 StatBar.Punter.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     punts: PropTypes.number,
     puntYards: PropTypes.number,
     averagePuntYards: PropTypes.number,
@@ -383,11 +359,7 @@ StatBar.Returner = function Returner({ player }) {
 
 StatBar.Returner.propTypes = {
   player: PropTypes.shape({
-    playerInfo: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-      jerseyNumber: PropTypes.number,
-    }),
+    playerInfo: PropTypes.shape,
     kickoffReturns: PropTypes.number,
     kickoffReturnYards: PropTypes.number,
     puntReturns: PropTypes.number,
@@ -399,8 +371,10 @@ StatBar.Fumble = function Fumble({ player }) {
   return (
     <>
       <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">{player.fumblesCommitted}</span>
-      <span className="sbli-units">FUM</span>
+      <span className="sbli-stat">
+        {player.fumblesCommitted}
+        <span className="sbli-units">FUM</span>
+      </span>
       <span className="sbli-stat">
         {player.fumblesForced}
         <span className="sbli-units">FF</span>

@@ -8,13 +8,30 @@ import PlayForm from '../../../../components/forms/PlayForm';
 import { getGameStream } from '../../../../api/gameData';
 import GameStream from '../../../../components/GameStream';
 import Loading from '../../../../components/Loading';
+import { useAuth } from '../../../../utils/context/authContext';
+import { deletePlay } from '../../../../api/playData';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;
   const [gameStream, setGameStream] = useState({});
+  const [formStatus, setFormStatus] = useState('');
+  const { user } = useAuth();
 
   const updateGameStream = () => {
     getGameStream(gameId).then(setGameStream);
+  };
+
+  const hideForm = (method = '') => {
+    if (method === 'submit') {
+      updateGameStream();
+    }
+    setFormStatus('');
+  };
+
+  const handlePlayDelete = () => {
+    deletePlay(gameStream.lastPlay.id, user.sessionKey).then(() => {
+      updateGameStream();
+    });
   };
 
   useEffect(() => {
@@ -28,7 +45,23 @@ export default function ManageGameStream({ params }) {
   return (
     <>
       {gameStream.homeTeamScore !== undefined && <GameStream gameStream={gameStream} />}
-      <PlayForm gameId={parseInt(gameId, 10)} onUpdate={updateGameStream} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} />
+      {formStatus === '' && (
+        <div className="playform">
+          <div className="pf-buttons">
+            <button className="button" type="button" onClick={() => setFormStatus('new')}>
+              Next Play
+            </button>
+            <button className="button" type="button" onClick={() => setFormStatus('edit')}>
+              Edit Last Play
+            </button>
+            <button className="button button-red" type="button" onClick={handlePlayDelete} disabled={!gameStream.lastPlay.id > 0}>
+              Delete Last Play
+            </button>
+          </div>
+        </div>
+      )}
+      <PlayForm key={0} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'new'} />
+      <PlayForm key={gameStream?.lastPlay.id} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.lastPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'edit'} />
     </>
   );
 }

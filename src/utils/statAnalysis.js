@@ -96,6 +96,9 @@ const parsePossessionChanges = (formData) => {
   if (formData.fumbles.length === 0 && formData.laterals.length === 0) {
     return [possessionChanges];
   }
+  if (possessionChanges.length === 0) {
+    return [[]];
+  }
 
   const toPlace = [];
 

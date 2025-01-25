@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PlaySegment from './PlaySegment';
 import StatBar from './StatBar';
 import GameStreamField from './GameStreamField';
-import { GameStreamProvider } from '../utils/context/gameStreamContext.js';
+import { GameStreamProvider } from '../utils/context/gameStreamContext';
 
 export default function GameStream({ gameStream }) {
   const [expandedStats, setExpandedStats] = useState(false);
