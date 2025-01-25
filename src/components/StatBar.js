@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import FullStatsModal from './modals/FullStatsModals';
+import Stat from './Stat';
 
 export default function StatBar({ children }) {
   return (
@@ -134,29 +136,54 @@ StatBar.Ticker.propTypes = {
   }).isRequired,
 };
 
+StatBar.PlayerName = function PlayerName({ player, onClick = null }) {
+  const handleClick = () => {
+    if (onClick !== null) {
+      onClick();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && onClick !== null) {
+      onClick();
+    }
+  };
+
+  return (
+    <div role="button" className="sbli-player-name" onClick={handleClick} onKeyDown={handleKeyDown} tabIndex={0}>
+      {player.playerInfo.firstName[0]}. {player.playerInfo.lastName}
+      {player.playerInfo.jerseyNumber >= 0 && <span className="sbli-player-number">#{player.playerInfo.jerseyNumber}</span>}
+    </div>
+  );
+};
+
+StatBar.PlayerName.propTypes = {
+  player: PropTypes.shape({
+    playerInfo: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+      jerseyNumber: PropTypes.number,
+    }).isRequired,
+  }),
+  onClick: PropTypes.func,
+};
+
+StatBar.PlayerDivider = function PlayerDivider() {
+  return <div className="sbli-hr" />;
+};
+
 StatBar.Passer = function Passer({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.passCompletions}
-        <span className="sbli-ratio-slash">/</span>
-        {player.passAttempts}
-        <span className="sbli-units">PASS</span>
-      </span>
-      <span className="sbli-stat">
-        {player.passYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <span className="sbli-stat">
-        {player.passTouchdowns}
-        <span className="sbli-units">TD</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.interceptionsThrown}
-        <span className="sbli-units">INT</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.passCompletions} denominator={player.passAttempts} units="pass" />
+      <Stat stat={player.passYards} units="yds" />
+      <Stat stat={player.passTouchdowns} units="td" />
+      <Stat stat={player.interceptionsThrown} units="int" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -173,24 +200,16 @@ StatBar.Passer.propTypes = {
 };
 
 StatBar.Receiver = function Receiver({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.receptions}
-        <span className="sbli-ratio-slash">/</span>
-        {player.receivingTargets}
-        <span className="sbli-units">REC</span>
-      </span>
-      <span className="sbli-stat">
-        {player.receivingYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.receivingTouchdowns}
-        <span className="sbli-units">TD</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.receptions} denominator={player.receivingTargets} units="rec" />
+      <Stat stat={player.receivingYards} units="yds" />
+      <Stat stat={player.receivingTouchdowns} units="td" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -206,22 +225,16 @@ StatBar.Receiver.propTypes = {
 };
 
 StatBar.Rusher = function Rusher({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.rushAttempts}
-        <span className="sbli-units">RUSH</span>
-      </span>
-      <span className="sbli-stat">
-        {player.rushYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.rushTouchdowns}
-        <span className="sbli-units">TD</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.rushAttempts} units="rush" />
+      <Stat stat={player.rushYards} units="yds" />
+      <Stat stat={player.rushTouchdowns} units="td" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -236,26 +249,17 @@ StatBar.Rusher.propTypes = {
 };
 
 StatBar.Defender = function Defender({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.tackles}
-        <span className="sbli-units">TCKL</span>
-      </span>
-      <span className="sbli-stat">
-        {player.sacks}
-        <span className="sbli-units">SACK</span>
-      </span>
-      <span className="sbli-stat">
-        {player.interceptionsReceived}
-        <span className="sbli-units">INT</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.interceptionReturnTouchdowns + player.fumbleReturnTouchdowns}
-        <span className="sbli-units">TD</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.tackles} units="tckl" />
+      <Stat stat={player.sacks} units="sack" />
+      <Stat stat={player.interceptionsReceived} units="int" />
+      <Stat stat={player.interceptionReturnTouchdowns + player.fumbleReturnTouchdowns} units="td" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -272,22 +276,16 @@ StatBar.Defender.propTypes = {
 };
 
 StatBar.Kicker = function Kicker({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.fieldGoalsMade}
-        <span className="sbli-ratio-slash">/</span>
-        {player.fieldGoalAttempts}
-        <span className="sbli-units">FG</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.extraPointsMade}
-        <span className="sbli-ratio-slash">/</span>
-        {player.extraPointAttempts}
-        <span className="sbli-units">XP</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.kickoffs} units="kickoff" />
+      <Stat stat={player.fieldGoalsMade} denominator={player.fieldGoalAttempts} units="fg" />
+      <Stat stat={player.extraPointsMade} denominator={player.extraPointAttempts} units="xp" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -295,6 +293,7 @@ StatBar.Kicker = function Kicker({ player }) {
 StatBar.Kicker.propTypes = {
   player: PropTypes.shape({
     playerInfo: PropTypes.shape,
+    kickoffs: PropTypes.number,
     fieldGoalAttempts: PropTypes.number,
     fieldGoalsMade: PropTypes.number,
     extraPointAttempts: PropTypes.number,
@@ -303,22 +302,16 @@ StatBar.Kicker.propTypes = {
 };
 
 StatBar.Punter = function Punter({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.punts}
-        <span className="sbli-units">PUNT</span>
-      </span>
-      <span className="sbli-stat">
-        {player.puntYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.averagePuntYards.toFixed(1)}
-        <span className="sbli-units">AVG</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.punts} units="punt" />
+      <Stat stat={player.puntYards} units="yds" />
+      <Stat stat={player.averagePuntYards} units="avg" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -333,26 +326,17 @@ StatBar.Punter.propTypes = {
 };
 
 StatBar.Returner = function Returner({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.puntReturns}
-        <span className="sbli-units">PUNT RET</span>
-      </span>
-      <span className="sbli-stat">
-        {player.puntReturnYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <span className="sbli-stat">
-        {player.kickoffReturns}
-        <span className="sbli-units">KICK RET</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.kickoffReturnYards}
-        <span className="sbli-units">YDS</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.puntReturns} units="punt ret" />
+      <Stat stat={player.puntReturnYards} units="yds" />
+      <Stat stat={player.kickoffReturns} units="kick ret" />
+      <Stat stat={player.kickoffReturnYards} units="yds" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -368,22 +352,16 @@ StatBar.Returner.propTypes = {
 };
 
 StatBar.Fumble = function Fumble({ player }) {
+  const [viewPlayerStats, setViewPlayerStats] = useState(false);
+
   return (
     <>
-      <StatBar.PlayerName playerInfo={player.playerInfo} />
-      <span className="sbli-stat">
-        {player.fumblesCommitted}
-        <span className="sbli-units">FUM</span>
-      </span>
-      <span className="sbli-stat">
-        {player.fumblesForced}
-        <span className="sbli-units">FF</span>
-      </span>
-      <span className="sbli-stat last">
-        {player.fumblesRecovered}
-        <span className="sbli-units">FR</span>
-      </span>
-      <div className="sbli-hr" />
+      {viewPlayerStats && <FullStatsModal player={player} onClose={() => setViewPlayerStats(false)} />}
+      <StatBar.PlayerName player={player} onClick={() => setViewPlayerStats(true)} />
+      <Stat stat={player.fumblesCommitted} units="fum" />
+      <Stat stat={player.fumblesForced} units="ff" />
+      <Stat stat={player.fumblesRecovered} units="fr" last />
+      <StatBar.PlayerDivider />
     </>
   );
 };
@@ -394,22 +372,5 @@ StatBar.Fumble.propTypes = {
     fumblesCommitted: PropTypes.number,
     fumblesForced: PropTypes.number,
     fumblesRecovered: PropTypes.number,
-  }).isRequired,
-};
-
-StatBar.PlayerName = function PlayerName({ playerInfo }) {
-  return (
-    <span className="sbli-player-name">
-      {playerInfo.firstName[0]}. {playerInfo.lastName}
-      {playerInfo.jerseyNumber >= 0 && <span className="sbli-player-number">#{playerInfo.jerseyNumber}</span>}
-    </span>
-  );
-};
-
-StatBar.PlayerName.propTypes = {
-  playerInfo: PropTypes.shape({
-    firstName: PropTypes.string,
-    lastName: PropTypes.string,
-    jerseyNumber: PropTypes.number,
   }).isRequired,
 };

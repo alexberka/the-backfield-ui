@@ -105,179 +105,179 @@ export default function GameStream({ gameStream }) {
             </div>
           </div>
         )}
+        <StatBar homeTeamStats={gameStream.homeTeamPlayerStats} awayTeamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay}>
+          {expandedStats && (
+            <>
+              <div className="sbtn-container sbtn-home">
+                <div className="primary-color-bar" style={{ borderColor: gameStream.homeTeam.colorPrimaryHex }} />
+                <div className="secondary-color-bar" style={{ borderColor: gameStream.homeTeam.colorSecondaryHex }} />
+                <span className="stat-bar-team-name">
+                  {gameStream.homeTeam.locationName} <span className="sbtn-nick">{gameStream.homeTeam.nickname}</span>
+                </span>
+              </div>
+              <div className="sbtn-container sbtn-away">
+                <div className="primary-color-bar" style={{ borderColor: gameStream.awayTeam.colorPrimaryHex }} />
+                <div className="secondary-color-bar" style={{ borderColor: gameStream.awayTeam.colorSecondaryHex }} />
+                <span className="stat-bar-team-name">
+                  {gameStream.awayTeam.locationName} <span className="sbtn-nick">{gameStream.awayTeam.nickname}</span>
+                </span>
+              </div>
+            </>
+          )}
+          <StatBar.Section title={expandedStats && 'Last Play'}>
+            <StatBar.Column>
+              <StatBar.Ticker teamStats={gameStream.homeTeamPlayerStats} lastPlay={gameStream.lastPlay} />
+            </StatBar.Column>
+            <StatBar.Column>
+              <StatBar.Ticker teamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay} />
+            </StatBar.Column>
+          </StatBar.Section>
+          <button type="button" className="sb-expand" onClick={() => setExpandedStats((prev) => !prev)}>
+            {expandedStats ? '- Collapse Stats -' : '- Expand Stats -'}
+          </button>
+          {expandedStats && (
+            <>
+              <StatBar.Section title="Passing">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.passAttempts !== 0)
+                    .sort((a, b) => b.passYards - a.passYards)
+                    .map((player) => (
+                      <StatBar.Passer player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.passAttempts !== 0)
+                    .sort((a, b) => b.passYards - a.passYards)
+                    .map((player) => (
+                      <StatBar.Passer player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Receiving">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.receivingTargets !== 0 || player.receivingYards !== 0)
+                    .sort((a, b) => b.receptions - a.receptions)
+                    .sort((a, b) => b.receivingYards - a.receivingYards)
+                    .map((player) => (
+                      <StatBar.Receiver player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.receivingTargets !== 0 || player.receivingYards !== 0)
+                    .sort((a, b) => b.receptions - a.receptions)
+                    .sort((a, b) => b.receivingYards - a.receivingYards)
+                    .map((player) => (
+                      <StatBar.Receiver player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Rushing">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.rushAttempts !== 0 || player.rushYards !== 0)
+                    .sort((a, b) => b.rushYards - a.rushYards)
+                    .map((player) => (
+                      <StatBar.Rusher player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.rushAttempts !== 0 || player.rushYards !== 0)
+                    .sort((a, b) => b.rushYards - a.rushYards)
+                    .map((player) => (
+                      <StatBar.Rusher player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Kicking">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.kickoffs !== 0 || player.fieldGoalAttempts !== 0 || player.extraPointAttempts !== 0)
+                    .sort((a, b) => b.fieldGoalAttempts - a.fieldGoalAttempts)
+                    .map((player) => (
+                      <StatBar.Kicker player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.kickoffs !== 0 || player.fieldGoalAttempts !== 0 || player.extraPointAttempts !== 0)
+                    .sort((a, b) => b.fieldGoalAttempts - a.fieldGoalAttempts)
+                    .map((player) => (
+                      <StatBar.Kicker player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Punting">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.punts !== 0)
+                    .sort((a, b) => b.punts - a.punts)
+                    .map((player) => (
+                      <StatBar.Punter player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.punts !== 0)
+                    .sort((a, b) => b.punts - a.punts)
+                    .map((player) => (
+                      <StatBar.Punter player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Returns">
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.kickoffReturns !== 0 || player.puntReturns !== 0)
+                    .sort((a, b) => b.puntReturnYards - a.puntReturnYards)
+                    .sort((a, b) => b.kickoffReturnYards - a.kickoffReturnYards)
+                    .map((player) => (
+                      <StatBar.Returner player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.kickoffReturns !== 0 || player.puntReturns !== 0)
+                    .sort((a, b) => b.puntReturns - a.puntReturns)
+                    .sort((a, b) => b.kickoffReturns - a.kickoffReturns)
+                    .map((player) => (
+                      <StatBar.Returner player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <StatBar.Section title="Defense" divider={false}>
+                <StatBar.Column>
+                  {gameStream.homeTeamPlayerStats
+                    .filter((player) => player.tackles !== 0 || player.sacks !== 0 || player.interceptionsReceived !== 0 || player.fumbleReturnTouchdowns !== 0)
+                    .sort((a, b) => b.interceptionsReceived - a.interceptionsReceived)
+                    .sort((a, b) => b.sacks - a.sacks)
+                    .sort((a, b) => b.tackles - a.tackles)
+                    .map((player) => (
+                      <StatBar.Defender player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+                <StatBar.Column>
+                  {gameStream.awayTeamPlayerStats
+                    .filter((player) => player.tackles !== 0 || player.sacks !== 0 || player.interceptionsReceived !== 0 || player.fumbleReturnTouchdowns !== 0)
+                    .sort((a, b) => b.interceptionsReceived - a.interceptionsReceived)
+                    .sort((a, b) => b.sacks - a.sacks)
+                    .sort((a, b) => b.tackles - a.tackles)
+                    .map((player) => (
+                      <StatBar.Defender player={player} key={player.id} />
+                    ))}
+                </StatBar.Column>
+              </StatBar.Section>
+              <button type="button" className="sb-expand" onClick={() => setExpandedStats(false)}>
+                - Collapse Stats -
+              </button>
+            </>
+          )}
+        </StatBar>
       </GameStreamProvider>
-      <StatBar homeTeamStats={gameStream.homeTeamPlayerStats} awayTeamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay}>
-        {expandedStats && (
-          <>
-            <div className="sbtn-container sbtn-home">
-              <div className="primary-color-bar" style={{ borderColor: gameStream.homeTeam.colorPrimaryHex }} />
-              <div className="secondary-color-bar" style={{ borderColor: gameStream.homeTeam.colorSecondaryHex }} />
-              <span className="stat-bar-team-name">
-                {gameStream.homeTeam.locationName} <span className="sbtn-nick">{gameStream.homeTeam.nickname}</span>
-              </span>
-            </div>
-            <div className="sbtn-container sbtn-away">
-              <div className="primary-color-bar" style={{ borderColor: gameStream.awayTeam.colorPrimaryHex }} />
-              <div className="secondary-color-bar" style={{ borderColor: gameStream.awayTeam.colorSecondaryHex }} />
-              <span className="stat-bar-team-name">
-                {gameStream.awayTeam.locationName} <span className="sbtn-nick">{gameStream.awayTeam.nickname}</span>
-              </span>
-            </div>
-          </>
-        )}
-        <StatBar.Section title={expandedStats && 'Last Play'}>
-          <StatBar.Column>
-            <StatBar.Ticker teamStats={gameStream.homeTeamPlayerStats} lastPlay={gameStream.lastPlay} />
-          </StatBar.Column>
-          <StatBar.Column>
-            <StatBar.Ticker teamStats={gameStream.awayTeamPlayerStats} lastPlay={gameStream.lastPlay} />
-          </StatBar.Column>
-        </StatBar.Section>
-        <button type="button" className="sb-expand" onClick={() => setExpandedStats((prev) => !prev)}>
-          {expandedStats ? '- Collapse Stats -' : '- Expand Stats -'}
-        </button>
-        {expandedStats && (
-          <>
-            <StatBar.Section title="Passing">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.passAttempts !== 0)
-                  .sort((a, b) => b.passYards - a.passYards)
-                  .map((player) => (
-                    <StatBar.Passer player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.passAttempts !== 0)
-                  .sort((a, b) => b.passYards - a.passYards)
-                  .map((player) => (
-                    <StatBar.Passer player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Receiving">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.receivingTargets !== 0 || player.receivingYards !== 0)
-                  .sort((a, b) => b.receptions - a.receptions)
-                  .sort((a, b) => b.receivingYards - a.receivingYards)
-                  .map((player) => (
-                    <StatBar.Receiver player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.receivingTargets !== 0 || player.receivingYards !== 0)
-                  .sort((a, b) => b.receptions - a.receptions)
-                  .sort((a, b) => b.receivingYards - a.receivingYards)
-                  .map((player) => (
-                    <StatBar.Receiver player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Rushing">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.rushAttempts !== 0 || player.rushYards !== 0)
-                  .sort((a, b) => b.rushYards - a.rushYards)
-                  .map((player) => (
-                    <StatBar.Rusher player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.rushAttempts !== 0 || player.rushYards !== 0)
-                  .sort((a, b) => b.rushYards - a.rushYards)
-                  .map((player) => (
-                    <StatBar.Rusher player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Kicking">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.fieldGoalAttempts !== 0 || player.extraPointAttempts !== 0)
-                  .sort((a, b) => b.fieldGoalAttempts - a.fieldGoalAttempts)
-                  .map((player) => (
-                    <StatBar.Kicker player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.fieldGoalAttempts !== 0 || player.extraPointAttempts !== 0)
-                  .sort((a, b) => b.fieldGoalAttempts - a.fieldGoalAttempts)
-                  .map((player) => (
-                    <StatBar.Kicker player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Punting">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.punts !== 0)
-                  .sort((a, b) => b.punts - a.punts)
-                  .map((player) => (
-                    <StatBar.Punter player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.punts !== 0)
-                  .sort((a, b) => b.punts - a.punts)
-                  .map((player) => (
-                    <StatBar.Punter player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Returns">
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.kickoffReturns !== 0 || player.puntReturns !== 0)
-                  .sort((a, b) => b.puntReturnYards - a.puntReturnYards)
-                  .sort((a, b) => b.kickoffReturnYards - a.kickoffReturnYards)
-                  .map((player) => (
-                    <StatBar.Returner player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.kickoffReturns !== 0 || player.puntReturns !== 0)
-                  .sort((a, b) => b.puntReturns - a.puntReturns)
-                  .sort((a, b) => b.kickoffReturns - a.kickoffReturns)
-                  .map((player) => (
-                    <StatBar.Returner player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <StatBar.Section title="Defense" divider={false}>
-              <StatBar.Column>
-                {gameStream.homeTeamPlayerStats
-                  .filter((player) => player.tackles !== 0 || player.sacks !== 0 || player.interceptionsReceived !== 0 || player.fumbleReturnTouchdowns !== 0)
-                  .sort((a, b) => b.interceptionsReceived - a.interceptionsReceived)
-                  .sort((a, b) => b.sacks - a.sacks)
-                  .sort((a, b) => b.tackles - a.tackles)
-                  .map((player) => (
-                    <StatBar.Defender player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-              <StatBar.Column>
-                {gameStream.awayTeamPlayerStats
-                  .filter((player) => player.tackles !== 0 || player.sacks !== 0 || player.interceptionsReceived !== 0 || player.fumbleReturnTouchdowns !== 0)
-                  .sort((a, b) => b.interceptionsReceived - a.interceptionsReceived)
-                  .sort((a, b) => b.sacks - a.sacks)
-                  .sort((a, b) => b.tackles - a.tackles)
-                  .map((player) => (
-                    <StatBar.Defender player={player} key={player.id} />
-                  ))}
-              </StatBar.Column>
-            </StatBar.Section>
-            <button type="button" className="sb-expand" onClick={() => setExpandedStats(false)}>
-              - Collapse Stats -
-            </button>
-          </>
-        )}
-      </StatBar>
     </div>
   );
 }
