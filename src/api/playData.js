@@ -21,6 +21,25 @@ const createPlay = (payload) =>
       .catch(reject);
   });
 
+const updatePlay = (payload) =>
+  new Promise((resolve, reject) => {
+    fetch(`${dbUrl}/plays/${payload.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((resp) => {
+        if (resp.ok) {
+          return resp.json();
+        }
+        return resp;
+      })
+      .then(resolve)
+      .catch(reject);
+  });
+
 const deletePlay = (playId, sessionKey) =>
   new Promise((resolve, reject) => {
     fetch(`${dbUrl}/plays/${playId}?sessionKey=${sessionKey}`, {
@@ -39,4 +58,4 @@ const deletePlay = (playId, sessionKey) =>
       .catch(reject);
   });
 
-export { createPlay, deletePlay };
+export { createPlay, updatePlay, deletePlay };

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../utils/context/authContext';
-import { createPlay, deletePlay } from '../../api/playData';
+import { createPlay, updatePlay } from '../../api/playData';
 import PlayerSelect from '../PlayerSelect';
 import FieldPositionSlider from '../FieldPositionSlider';
 import { parsePlayerPossession, parsePossessionChanges } from '../../utils/statAnalysis';
@@ -154,8 +154,7 @@ const initialDisplay = {
 //   penalties: [],
 // };
 
-export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdit = initialState }) {
-  const [newPlay, setNewPlay] = useState(false);
+export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdit = initialState, visible = true }) {
   const [formData, setFormData] = useState({});
   const [validatedFormData, setValidatedFormData] = useState(initialState);
   const [formDisplay, setFormDisplay] = useState(initialDisplay);
@@ -165,6 +164,24 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const [lateralCreator, setLateralCreator] = useState(initialLateralCreator);
   const [penaltyCreator, setPenaltyCreator] = useState(initialPenaltyCreator);
   const [penalties, setPenalties] = useState([]);
+
+  const resetDisplay = {
+    pass: playEdit.passerId != null && !playEdit.kickFake,
+    rush: playEdit.rusherId != null && !playEdit.kickFake,
+    kickoff: playEdit.kickoff,
+    fieldGoal: playEdit.fieldGoal,
+    punt: playEdit.punt,
+    kickBlocked: playEdit.kickBlocked,
+    interception: playEdit.interceptedById != null || playEdit.interceptedAt != null,
+    fakeToPass: (playEdit.punt || playEdit.fieldGoal) && playEdit.passerId != null,
+    fakeToRush: (playEdit.punt || playEdit.fieldGoal) && playEdit.rusherId != null,
+    twoPointPass: playEdit.conversion && playEdit.conversionPasserId != null,
+    twoPointRush: playEdit.conversion && playEdit.conversionRusherId != null,
+    touchdown: playEdit.touchdownPlayerId != null,
+    lateralCreator: false,
+    fumbleCreator: false,
+    penaltyCreator: false,
+  };
 
   const fieldPositionToString = (fpAsInt) => {
     if (fpAsInt == null) {
@@ -201,8 +218,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
 
   const allReset = () => {
     const reset = playEdit || initialState;
-    setFormData(() => ({ ...reset, sessionKey: user.sessionKey, gameId }));
-    setFormDisplay(initialDisplay);
+    setFormData({ ...reset, sessionKey: user.sessionKey, gameId });
+    setFormDisplay(resetDisplay);
     setPlayerWithBall({});
     setFumbleCreator(initialFumbleCreator);
     setLateralCreator(initialLateralCreator);
@@ -643,27 +660,19 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validatedFormData) {
-      createPlay(validatedFormData).then(() => {
-        onUpdate();
-        allReset();
-        setNewPlay(false);
-      });
+      if (playEdit.id) {
+        updatePlay(validatedFormData).then(() => {
+          onUpdate('submit');
+          allReset();
+        });
+      } else {
+        createPlay(validatedFormData).then(() => {
+          onUpdate('submit');
+          allReset();
+        });
+      }
     }
   };
-
-  const handlePlayDelete = () => {
-    deletePlay(playEdit.prevPlayId, user.sessionKey).then(() => {
-      onUpdate();
-      allReset();
-      setNewPlay(false);
-    });
-  };
-
-  useEffect(() => {
-    if (newPlay) {
-      setFormData((prev) => ({ ...prev, sessionKey: user.sessionKey, gameId }));
-    }
-  }, [newPlay]);
 
   useEffect(() => {
     allReset();
@@ -680,25 +689,20 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     getAllPenalties(user.sessionKey).then(setPenalties);
   }, []);
 
-  if (!newPlay) {
-    return (
-      <div className="playform">
-        <div className="pf-buttons">
-          <button className="button" type="button" onClick={() => setNewPlay((prev) => !prev)}>
-            Add Play
-          </button>
-          {playEdit.prevPlayId !== -1 && (
-            <button className="button button-red" type="button" onClick={handlePlayDelete}>
-              Delete Last Play
-            </button>
-          )}
-        </div>
-      </div>
-    );
+  if (!formData.prevPlayId) {
+    return <div>Loading</div>;
   }
 
   return (
-    <form className="playform" onSubmit={handleSubmit}>
+    <form className={`playform ${!visible && 'hidden'}`} onSubmit={handleSubmit}>
+      <div className="pf-buttons">
+        <button className="button" type="button" onClick={() => onUpdate(true)}>
+          Collapse Form
+        </button>
+        <button className="button button-red" type="button" onClick={allReset}>
+          Reset Form
+        </button>
+      </div>
       <div className="pf-section">
         <div className="playform-team-select">
           <label>
@@ -1377,19 +1381,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       {validatedFormData.gameId === 0 && <div>Play is incomplete or illogical, double check form before submission</div>}
       <div className="pf-buttons">
         <button className="button" type="submit" disabled={validatedFormData.gameId === 0}>
-          Submit
+          {playEdit.id ? 'Update Play' : 'Add Play'}
         </button>
-        <button className="button" type="button" onClick={() => setNewPlay(false)}>
+        <button className="button" type="button" onClick={() => onUpdate()}>
           Collapse Form
         </button>
         <button className="button button-red" type="button" onClick={allReset}>
           Reset Form
         </button>
-        {playEdit.prevPlayId !== -1 && (
-          <button className="button button-red" type="button" onClick={handlePlayDelete}>
-            Delete Last Play
-          </button>
-        )}
       </div>
     </form>
   );
@@ -1494,4 +1493,5 @@ PlayForm.propTypes = {
     }),
     sessionKey: PropTypes.string,
   }),
+  visible: PropTypes.bool,
 };
