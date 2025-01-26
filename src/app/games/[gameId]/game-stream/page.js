@@ -10,11 +10,13 @@ import GameStream from '../../../../components/GameStream';
 import Loading from '../../../../components/Loading';
 import { useAuth } from '../../../../utils/context/authContext';
 import { deletePlay } from '../../../../api/playData';
+import DeletePlayModal from '../../../../components/modals/DeletePlayModal';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;
   const [gameStream, setGameStream] = useState({});
   const [formStatus, setFormStatus] = useState('');
+  const [checkDelete, setCheckDelete] = useState(false);
   const { user } = useAuth();
 
   const updateGameStream = () => {
@@ -32,6 +34,13 @@ export default function ManageGameStream({ params }) {
     deletePlay(gameStream.lastPlay.id, user.sessionKey).then(() => {
       updateGameStream();
     });
+  };
+
+  const hideModal = (confirmDelete) => {
+    if (confirmDelete === 'confirm') {
+      handlePlayDelete();
+    }
+    setCheckDelete(false);
   };
 
   useEffect(() => {
@@ -54,9 +63,10 @@ export default function ManageGameStream({ params }) {
             <button className="button" type="button" onClick={() => setFormStatus('edit')}>
               Edit Last Play
             </button>
-            <button className="button button-red" type="button" onClick={handlePlayDelete} disabled={!gameStream.lastPlay.id > 0}>
+            <button className="button button-red" type="button" onClick={() => setCheckDelete(true)} disabled={!gameStream.lastPlay.id > 0}>
               Delete Last Play
             </button>
+            {checkDelete && <DeletePlayModal onClose={hideModal} />}
           </div>
         </div>
       )}

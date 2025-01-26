@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 import { FocusTrap } from '@ciceksepeti/cui';
 
 export default function ModalWrapper({ children, onHide = null }) {
+  const handleClick = (e) => {
+    if (e.target.id === 'modal-backdrop') {
+      onHide();
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       onHide();
@@ -12,7 +18,7 @@ export default function ModalWrapper({ children, onHide = null }) {
   return (
     <div className="modal-trap-wrapper">
       <FocusTrap as="div">
-        <div role="button" className="modal-backdrop" onClick={onHide} onKeyDown={handleKeyDown} tabIndex={0}>
+        <div role="button" className="modal-backdrop" id="modal-backdrop" onClick={handleClick} onKeyDown={handleKeyDown} tabIndex={0}>
           {children}
         </div>
       </FocusTrap>
