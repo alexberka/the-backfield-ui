@@ -17,6 +17,7 @@
     ]
   },
   "dependencies": {
+    "@ciceksepeti/cui": "^0.11.9",
     "@microsoft/signalr": "^8.0.7",
     "bootstrap": "^5.3.3",
     "firebase": "^8.2.0",
