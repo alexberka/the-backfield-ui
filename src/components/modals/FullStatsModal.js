@@ -6,7 +6,7 @@ import Stat from '../Stat';
 export default function FullStatsModal({ player, onClose }) {
   return (
     <ModalWrapper onHide={onClose}>
-      <div className="full-stats-modal">
+      <div className="full-stats-modal std-mod">
         <div className="fs-mod-header">
           <h3 className="fs-mod-header-player">
             {player.playerInfo.firstName} {player.playerInfo.lastName}
@@ -111,7 +111,7 @@ export default function FullStatsModal({ player, onClose }) {
           )}
         </div>
         {/* To satisfy FocusTrap component in wrapper, accessibility, though clicking anywhere will close */}
-        <button type="button" className="button button-red">
+        <button type="button" className="button button-red" onClick={onClose}>
           Close
         </button>
       </div>

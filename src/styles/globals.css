@@ -875,17 +875,21 @@ body {
   }
 }
 
-.full-stats-modal {
+.std-mod {
   position: relative;
   top: 20vh;
   margin: auto;
   width: fit-content;
+  max-width: 100vw;
   height: fit-content;
   background: #212121;
   border: 2px solid greenyellow;
   border-radius: 5px;
   box-shadow: 5px 5px 3px -2px black;
   padding: 5px 10px;
+}
+
+.full-stats-modal {
   .fs-mod-header {
     width: max-content;
     margin: auto;
@@ -913,6 +917,18 @@ body {
   }
   button {
     margin-top: 5px;
+  }
+}
+
+.delete-play-modal {
+  max-width: 400px;
+  .dp-mod-text {
+    font-size: 0.8rem;
+  }
+  .dp-mod-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 5px;
   }
 }
 
