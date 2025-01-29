@@ -8,6 +8,7 @@ import FieldPositionSlider from '../FieldPositionSlider';
 import { parsePlayerPossession, parsePossessionChanges } from '../../utils/statAnalysis';
 import PlayerMultiSelect from '../PlayerMultiSelect';
 import getAllPenalties from '../../api/penaltyData';
+import CheckButton from '../CheckButton';
 
 const initialState = {
   id: 0,
@@ -705,35 +706,30 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       </div>
       <div className="pf-section">
         <div className="playform-team-select">
-          <label>
-            <input
-              type="radio"
-              name="teamId"
-              readOnly
-              value={homeTeam.id}
-              checked={formData.teamId === homeTeam.id}
-              onClick={(e) => {
-                handleDisplay();
-                handleChange(e);
-              }}
-            />
+          <CheckButton
+            name="teamId"
+            value={homeTeam.id}
+            checked={formData.teamId === homeTeam.id}
+            onClick={(e) => {
+              handleDisplay();
+              handleChange(e);
+            }}
+          >
             {homeTeam.locationName}
-          </label>
-          <div>Possession</div>
-          <label>
+          </CheckButton>
+          <div className={`pf-poss ${formData.teamId === awayTeam.id ? 'away' : 'home'}`}>Possession</div>
+          <CheckButton
+            className="away"
+            name="teamId"
+            value={awayTeam.id}
+            checked={formData.teamId === awayTeam.id}
+            onClick={(e) => {
+              handleDisplay();
+              handleChange(e);
+            }}
+          >
             {awayTeam.locationName}
-            <input
-              type="radio"
-              name="teamId"
-              readOnly
-              value={awayTeam.id}
-              checked={formData.teamId === awayTeam.id}
-              onClick={(e) => {
-                handleDisplay();
-                handleChange(e);
-              }}
-            />
-          </label>
+          </CheckButton>
         </div>
         <div className="playform-game-status">
           <input className="playform-game-period" name="gamePeriod" type="number" min={0} onChange={handleChange} placeholder="Quarter" value={formData.gamePeriod || 0} />
@@ -824,174 +820,45 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             </p>
           </div>
         )}
-        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
-          <>
-            <label>
-              Touchdown?
-              <input
-                type="checkbox"
-                name="touchdown"
-                value={!formDisplay.touchdown}
-                checked={formDisplay.touchdown}
-                onChange={(e) => {
-                  handleDisplay(e);
-                }}
-              />
-            </label>
-            {formDisplay.touchdown && (
-              <div>
-                <div className="pf-touchdown-toggles">
-                  <label>
-                    <input
-                      type="radio"
-                      name="extraPoint"
-                      readOnly
-                      value={!formData.extraPoint}
-                      checked={formData.extraPoint}
-                      onClick={(e) => {
-                        if (e.target.value === 'true') {
-                          selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
-                        } else {
-                          selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
-                        }
-                        handleChange(e);
-                      }}
-                    />
-                    Extra Point
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="conversion"
-                      readOnly
-                      value={!formData.conversion}
-                      checked={formData.conversion}
-                      onClick={(e) => {
-                        if (e.target.value === 'true') {
-                          selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
-                        } else {
-                          selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
-                        }
-                        handleChange(e);
-                      }}
-                    />
-                    2pt Conversion
-                  </label>
-                </div>
-                {formData.extraPoint && (
-                  <div>
-                    <p>Kicker:</p>
-                    <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
-                    <label>
-                      Extra Point Good:
-                      <input type="checkbox" name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onChange={handleChange} />
-                    </label>
-                    {!formData.extraPointGood && (
-                      <label>
-                        Fake:
-                        <input type="checkbox" name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onChange={handleChange} />
-                      </label>
-                    )}
-                  </div>
-                )}
-                {(formData.conversion || formData.extraPointFake) && (
-                  <>
-                    <div className="pf-two-point-toggles">
-                      <label>
-                        <input type="radio" name="twoPointPass" readOnly value={!formDisplay.twoPointPass} checked={formDisplay.twoPointPass} onClick={handleDisplay} />
-                        Pass
-                      </label>
-                      <label>
-                        <input type="radio" name="twoPointRush" readOnly value={!formDisplay.twoPointRush} checked={formDisplay.twoPointRush} onClick={handleDisplay} />
-                        Rush
-                      </label>
-                    </div>
-                    <div>
-                      {formDisplay.twoPointPass && (
-                        <>
-                          <p>Passer:</p>
-                          <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
-                          <p>Receiver:</p>
-                          <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
-                        </>
-                      )}
-                      {formDisplay.twoPointRush && (
-                        <>
-                          <p>Rusher:</p>
-                          <PlayerSelect name="conversionRusherId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionRusherId || 'null'} />
-                        </>
-                      )}
-                      <label>
-                        Conversion Good:
-                        <input type="checkbox" name="conversionGood" value={!formData.conversionGood} checked={formData.conversionGood} onChange={handleChange} />
-                      </label>
-                    </div>
-                  </>
-                )}
-                {(formData.extraPoint || formData.conversion) && !formData.extraPointGood && !formData.conversionGood && (
-                  <div>
-                    <label>
-                      Defensive Conversion:
-                      <input type="checkbox" name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onChange={handleChange} />
-                    </label>
-                    {formData.defensiveConversion && (
-                      <>
-                        <p>Returned by</p>
-                        <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
       </div>
       <div className="playform-type-radios">
-        <label>
-          <input type="radio" name="pass" readOnly value={!formDisplay.pass} checked={formDisplay.pass} onClick={handleDisplay} />
-          Pass
-        </label>
-        <label>
-          <input type="radio" name="rush" readOnly value={!formDisplay.rush} checked={formDisplay.rush} onClick={handleDisplay} />
-          Rush
-        </label>
-        <label>
-          <input type="radio" name="punt" readOnly value={!formDisplay.punt} checked={formDisplay.punt} onClick={handleDisplay} />
-          Punt
-        </label>
-        <label>
-          <input type="radio" name="fieldGoal" readOnly value={!formDisplay.fieldGoal} checked={formDisplay.fieldGoal} onClick={handleDisplay} />
-          Field Goal
-        </label>
-        <label>
-          <input type="radio" name="kickoff" readOnly value={!formDisplay.kickoff} checked={formDisplay.kickoff} onClick={handleDisplay} />
-          Kickoff
-        </label>
+        <CheckButton name="pass" value={!formDisplay.pass} checked={formDisplay.pass} onClick={handleDisplay}>
+          PASS
+        </CheckButton>
+        <CheckButton name="rush" value={!formDisplay.rush} checked={formDisplay.rush} onClick={handleDisplay}>
+          RUSH
+        </CheckButton>
+        <CheckButton name="punt" value={!formDisplay.punt} checked={formDisplay.punt} onClick={handleDisplay}>
+          PUNT
+        </CheckButton>
+        <CheckButton name="fieldGoal" value={!formDisplay.fieldGoal} checked={formDisplay.fieldGoal} onClick={handleDisplay}>
+          FIELD GOAL
+        </CheckButton>
+        <CheckButton name="kickoff" value={!formDisplay.kickoff} checked={formDisplay.kickoff} onClick={handleDisplay}>
+          KICKOFF
+        </CheckButton>
       </div>
       <div className={formDisplay.punt || formDisplay.fieldGoal ? 'pf-section' : ''}>
         {formDisplay.punt && (
           <div className="pf-punt">
             <p>Kicker:</p>
             <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
-            <label>
-              Fake:
-              <input
-                type="checkbox"
-                name="kickFake"
-                value={!formData.kickFake}
-                checked={formData.kickFake}
-                onChange={(e) => {
-                  handleChange(e);
-                  if (e.target.value === 'true') {
-                    selectiveReset(['kickFieldedAt', 'kickReturnerId', 'kickFairCatch', 'kickTouchback']);
-                  }
-                  if (e.target.value === 'false') {
-                    handleDisplay(e);
-                  }
-                }}
-              />
-            </label>
+            <CheckButton
+              name="kickFake"
+              value={!formData.kickFake}
+              checked={formData.kickFake}
+              onClick={(e) => {
+                handleChange(e);
+                if (e.target.value === 'true') {
+                  selectiveReset(['kickFieldedAt', 'kickReturnerId', 'kickFairCatch', 'kickTouchback']);
+                }
+                if (e.target.value === 'false') {
+                  handleDisplay(e);
+                }
+              }}
+            >
+              FAKE
+            </CheckButton>
             {!formData.kickFake && (
               <div>
                 <p>Returner:</p>
@@ -1000,32 +867,28 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             )}
             {!formData.kickFake && (
               <div>
-                <label>
-                  <p>Touchback</p>
-                  <input
-                    type="checkbox"
-                    name="kickTouchback"
-                    value={!formData.kickTouchback}
-                    checked={formData.kickTouchback}
-                    onChange={(e) => {
-                      handleChange(e);
-                      selectiveReset(['kickFieldedAt']);
-                    }}
-                  />
-                </label>
-                <label>
-                  Fair Catch
-                  <input
-                    type="checkbox"
-                    name="kickFairCatch"
-                    value={!formData.kickFairCatch}
-                    checked={formData.kickFairCatch}
-                    onChange={(e) => {
-                      handleChange(e);
-                      selectiveReset(['kickFieldedAt']);
-                    }}
-                  />
-                </label>
+                <CheckButton
+                  name="kickTouchback"
+                  value={!formData.kickTouchback}
+                  checked={formData.kickTouchback}
+                  onClick={(e) => {
+                    handleChange(e);
+                    selectiveReset(['kickFieldedAt']);
+                  }}
+                >
+                  TOUCHBACK
+                </CheckButton>
+                <CheckButton
+                  name="kickFairCatch"
+                  value={!formData.kickFairCatch}
+                  checked={formData.kickFairCatch}
+                  onClick={(e) => {
+                    handleChange(e);
+                    selectiveReset(['kickFieldedAt']);
+                  }}
+                >
+                  FAIR CATCH
+                </CheckButton>
               </div>
             )}
             {!formData.kickFake && (
@@ -1042,56 +905,50 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           <div className="pf-fieldgoal">
             <p>Kicker:</p>
             <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
-            <label>
-              <p>Fake</p>
-              <input
-                type="checkbox"
-                name="kickFake"
-                value={!formData.kickFake}
-                checked={formData.kickFake}
-                onChange={(e) => {
-                  handleChange(e);
-                  if (e.target.value === 'true') {
-                    selectiveReset(['kickGood']);
-                  }
-                  if (e.target.value === 'false') {
-                    handleDisplay(e);
-                  }
-                }}
-              />
-            </label>
+            <CheckButton
+              name="kickFake"
+              value={!formData.kickFake}
+              checked={formData.kickFake}
+              onClick={(e) => {
+                handleChange(e);
+                if (e.target.value === 'true') {
+                  selectiveReset(['kickGood']);
+                }
+                if (e.target.value === 'false') {
+                  handleDisplay(e);
+                }
+              }}
+            >
+              FAKE
+            </CheckButton>
             {!formData.kickFake && (
-              <label>
-                <p>Good</p>
-                <input
-                  type="checkbox"
-                  name="kickGood"
-                  value={!formData.kickGood}
-                  checked={formData.kickGood}
-                  onChange={(e) => {
-                    handleDisplay({ target: { name: 'kickBlocked', value: 'false' } });
-                    handleChange(e);
-                  }}
-                />
-              </label>
+              <CheckButton
+                name="kickGood"
+                value={!formData.kickGood}
+                checked={formData.kickGood}
+                onClick={(e) => {
+                  handleDisplay({ target: { name: 'kickBlocked', value: 'false' } });
+                  handleChange(e);
+                }}
+              >
+                GOOD
+              </CheckButton>
             )}
           </div>
         )}
         {(formDisplay.fieldGoal || formDisplay.punt) && !formData.kickFake && (
           <div className="pf-kickblock">
-            <label>
-              <p>Blocked</p>
-              <input
-                type="checkbox"
-                name="kickBlocked"
-                value={!formDisplay.kickBlocked}
-                checked={formDisplay.kickBlocked}
-                onChange={(e) => {
-                  selectiveReset(['kickGood']);
-                  handleDisplay(e);
-                }}
-              />
-            </label>
+            <CheckButton
+              name="kickBlocked"
+              value={!formDisplay.kickBlocked}
+              checked={formDisplay.kickBlocked}
+              onClick={(e) => {
+                selectiveReset(['kickGood']);
+                handleDisplay(e);
+              }}
+            >
+              BLOCKED
+            </CheckButton>
             {formDisplay.kickBlocked && (
               <>
                 <div>
@@ -1108,66 +965,68 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
         )}
         {(formDisplay.fieldGoal || formDisplay.punt) && formData.kickFake && (
           <div className="pf-fake-play-toggles">
-            <label>
-              <input type="radio" name="fakeToPass" readOnly value={!formDisplay.fakeToPass} checked={formDisplay.fakeToPass} onClick={handleDisplay} />
-              Pass
-            </label>
-            <label>
-              <input type="radio" name="fakeToRush" readOnly value={!formDisplay.fakeToRush} checked={formDisplay.fakeToRush} onClick={handleDisplay} />
-              Rush
-            </label>
+            <CheckButton name="fakeToPass" value={!formDisplay.fakeToPass} checked={formDisplay.fakeToPass} onClick={handleDisplay}>
+              PASS
+            </CheckButton>
+            <CheckButton name="fakeToRush" value={!formDisplay.fakeToRush} checked={formDisplay.fakeToRush} onClick={handleDisplay}>
+              RUSH
+            </CheckButton>
           </div>
         )}
       </div>
       {(formDisplay.pass || formDisplay.fakeToPass) && (
-        <div className="pf-section">
-          <div className="pf-pass">
-            <div className="pf-pass-root">
-              <p>Passer:</p>
-              <PlayerSelect name="passerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.passerId || 'null'} />
-              <p>Receiver:</p>
-              <PlayerSelect name="receiverId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.receiverId || 'null'} />
-            </div>
-            <label>
-              Complete:
-              <input
-                type="checkbox"
-                name="completion"
-                value={!formData.completion}
-                checked={formData.completion}
-                onChange={(e) => {
-                  handleChange(e);
-                  selectiveReset(['interceptedById', 'interceptedAt']);
-                  handleDisplay({ target: { name: 'interception', value: 'false' } });
-                }}
-              />
-            </label>
-            <label>
-              Interception:
-              <input
-                type="checkbox"
-                name="interception"
-                value={!formDisplay.interception}
-                checked={formDisplay?.interception}
-                onChange={(e) => {
-                  handleDisplay(e);
-                  selectiveReset(['completion']);
-                }}
-              />
-            </label>
-            <PlayerMultiSelect name="passDefenderIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.passDefenderIds} header="Pass Defenders" />
-            {formDisplay?.interception && (
-              <div className="playform-interception">
-                <div className="pf-int-statline">
-                  <p>Intercepted by</p>
-                  <PlayerSelect name="interceptedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.interceptedById || 'null'} />
-                  <div>at {fieldPositionToString(formData.interceptedAt)}</div>
-                </div>
-                <FieldPositionSlider name="interceptedAt" value={formData?.interceptedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
+        <>
+          <div className="pf-section">
+            <div className="pf-pass">
+              <div className="pf-pass-root">
+                <p>Passer:</p>
+                <PlayerSelect name="passerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.passerId || 'null'} />
+                <p>Receiver:</p>
+                <PlayerSelect name="receiverId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.receiverId || 'null'} />
               </div>
-            )}
+              <div className="flex width evenly">
+                <CheckButton
+                  name="completion"
+                  value={!formData.completion}
+                  checked={formData.completion}
+                  onClick={(e) => {
+                    handleChange(e);
+                    selectiveReset(['interceptedById', 'interceptedAt']);
+                    handleDisplay({ target: { name: 'interception', value: 'false' } });
+                  }}
+                >
+                  COMPLETION
+                </CheckButton>
+                <CheckButton
+                  name="interception"
+                  value={!formDisplay.interception}
+                  checked={formDisplay?.interception}
+                  onClick={(e) => {
+                    handleDisplay(e);
+                    selectiveReset(['completion']);
+                  }}
+                >
+                  INTERCEPTION
+                </CheckButton>
+              </div>
+              {formDisplay?.interception && (
+                <div className="playform-interception">
+                  <div className="pf-int-statline">
+                    <p>Intercepted by</p>
+                    <PlayerSelect name="interceptedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.interceptedById || 'null'} />
+                    <div>at {fieldPositionToString(formData.interceptedAt)}</div>
+                  </div>
+                  <FieldPositionSlider name="interceptedAt" value={formData?.interceptedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+          {!formData.completion && (
+            <div className="pf-section">
+              <PlayerMultiSelect name="passDefenderIds" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.passDefenderIds} header="Pass Defenders" />
+            </div>
+          )}
+        </>
       )}
       {(formDisplay.rush || formDisplay.fakeToRush) && (
         <div className="pf-section">
@@ -1184,19 +1043,17 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
             <p>Returner:</p>
             <PlayerSelect name="kickReturnerId" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickReturnerId || 'null'} />
-            <label>
-              Touchback:
-              <input
-                type="checkbox"
-                name="kickTouchback"
-                value={!formData.kickTouchback}
-                checked={formData.kickTouchback}
-                onChange={(e) => {
-                  handleChange(e);
-                  handleChange({ target: { name: 'kickFieldedAt', value: 'null' } });
-                }}
-              />
-            </label>
+            <CheckButton
+              name="kickTouchback"
+              value={!formData.kickTouchback}
+              checked={formData.kickTouchback}
+              onClick={(e) => {
+                handleChange(e);
+                handleChange({ target: { name: 'kickFieldedAt', value: 'null' } });
+              }}
+            >
+              TOUCHBACK
+            </CheckButton>
             {!formData.kickTouchback && (
               <div>
                 <div>
@@ -1319,39 +1176,39 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                 ))}
               </select>
               <div>
-                <label>
-                  <input type="radio" name="teamId-penalty" value={homeTeam.id} checked={penaltyCreator.teamId === homeTeam.id} readOnly onClick={handlePlayPenaltyChange} />
-                  {homeTeam.locationName}
-                </label>
-                <label>
-                  {awayTeam.locationName}
-                  <input type="radio" name="teamId-penalty" value={awayTeam.id} checked={penaltyCreator.teamId === awayTeam.id} onChange={handlePlayPenaltyChange} />
-                </label>
+                <CheckButton name="teamId-penalty" value={homeTeam.id} checked={penaltyCreator.teamId === homeTeam.id} onClick={handlePlayPenaltyChange}>
+                  {homeTeam.locationName.toUpperCase()}
+                </CheckButton>
+                <CheckButton name="teamId-penalty" value={awayTeam.id} checked={penaltyCreator.teamId === awayTeam.id} onClick={handlePlayPenaltyChange}>
+                  {awayTeam.locationName.toUpperCase()}
+                </CheckButton>
               </div>
               <p>Penalized Player</p>
               <PlayerSelect name="playerId" players={[...(penaltyCreator.teamId !== homeTeam.id ? awayTeam.players : []), ...(penaltyCreator.teamId !== awayTeam.id ? homeTeam.players : [])]} onChange={handlePlayPenaltyChange} value={penaltyCreator.playerId || 'null'} />
-              <label>
-                Enforced:
-                <input type="checkbox" name="enforced" value={!penaltyCreator.enforced} checked={penaltyCreator.enforced} onChange={handlePlayPenaltyChange} />
-              </label>
-              <p>Enforced at {fieldPositionToString(penaltyCreator.enforcedFrom)}</p>
-              <FieldPositionSlider name="enforcedFrom" value={penaltyCreator?.enforcedFrom} onChange={handlePlayPenaltyChange} possession={penaltyCreator.teamId !== null && (penaltyCreator.teamId === homeTeam.id ? 'away' : 'home')} />
-              <label>
-                <p>Yardage</p>
-                <input type="number" name="yardage" min={0} max={100} value={penaltyCreator.yardage || 0} onChange={handlePlayPenaltyChange} />
-              </label>
-              <label>
-                No Play:
-                <input type="checkbox" name="noPlay" value={!penaltyCreator.noPlay} checked={penaltyCreator.noPlay} onChange={handlePlayPenaltyChange} />
-              </label>
-              <label>
-                Loss Of Down:
-                <input type="checkbox" name="lossOfDown" value={!penaltyCreator.lossOfDown} checked={penaltyCreator.lossOfDown} onChange={handlePlayPenaltyChange} />
-              </label>
-              <label>
-                Automatic First Down:
-                <input type="checkbox" name="autoFirstDown" value={!penaltyCreator.autoFirstDown} checked={penaltyCreator.autoFirstDown} onChange={handlePlayPenaltyChange} />
-              </label>
+              <CheckButton name="enforced" value={!penaltyCreator.enforced} checked={penaltyCreator.enforced} onClick={handlePlayPenaltyChange}>
+                ENFORCED{!penaltyCreator.enforced && '?'}
+              </CheckButton>
+              {penaltyCreator.enforced && (
+                <>
+                  <p>Enforced at {fieldPositionToString(penaltyCreator.enforcedFrom)}</p>
+                  <FieldPositionSlider name="enforcedFrom" value={penaltyCreator?.enforcedFrom} onChange={handlePlayPenaltyChange} possession={penaltyCreator.teamId !== null && (penaltyCreator.teamId === homeTeam.id ? 'away' : 'home')} />
+                  <label>
+                    <p>Yardage</p>
+                    <input type="number" name="yardage" min={0} max={100} value={penaltyCreator.yardage || 0} onChange={handlePlayPenaltyChange} />
+                  </label>
+                </>
+              )}
+              <div className="flex evenly width">
+                <CheckButton name="noPlay" value={!penaltyCreator.noPlay} checked={penaltyCreator.noPlay} onClick={handlePlayPenaltyChange}>
+                  NO PLAY
+                </CheckButton>
+                <CheckButton name="lossOfDown" value={!penaltyCreator.lossOfDown} checked={penaltyCreator.lossOfDown} onClick={handlePlayPenaltyChange}>
+                  LOSS OF DOWN
+                </CheckButton>
+                <CheckButton name="autoFirstDown" value={!penaltyCreator.autoFirstDown} checked={penaltyCreator.autoFirstDown} onClick={handlePlayPenaltyChange}>
+                  AUTOMATIC FIRST DOWN
+                </CheckButton>
+              </div>
               <button type="button" className="pf-creator-form-add" onClick={handlePlayPenaltyAdd}>
                 Add
               </button>
@@ -1378,6 +1235,116 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         </div>
       </div>
+      {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
+        <div className="pf-section">
+          <CheckButton
+            name="touchdown"
+            value={!formDisplay.touchdown}
+            checked={formDisplay.touchdown}
+            onClick={(e) => {
+              handleDisplay(e);
+            }}
+          >
+            TOUCHDOWN{formDisplay.touchdown ? '!' : '?'}
+          </CheckButton>
+          {formDisplay.touchdown && (
+            <div>
+              <div className="pf-touchdown-toggles flex evenly width">
+                <CheckButton
+                  name="extraPoint"
+                  value={!formData.extraPoint}
+                  checked={formData.extraPoint}
+                  onClick={(e) => {
+                    if (e.target.value === 'true') {
+                      selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
+                    } else {
+                      selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
+                    }
+                    handleChange(e);
+                  }}
+                >
+                  EXTRA POINT
+                </CheckButton>
+                <CheckButton
+                  name="conversion"
+                  value={!formData.conversion}
+                  checked={formData.conversion}
+                  onClick={(e) => {
+                    if (e.target.value === 'true') {
+                      selectiveReset(['extraPoint', 'extraPointGood', 'extraPointFake', 'defensiveConversion', 'extraPointKickerId']);
+                    } else {
+                      selectiveReset(['conversion', 'conversionPasserId', 'conversionReceiverId', 'conversionRusherId', 'defensiveConversion', 'conversionReturnerId']);
+                    }
+                    handleChange(e);
+                  }}
+                >
+                  2PT CONVERSION
+                </CheckButton>
+              </div>
+              {formData.extraPoint && (
+                <div>
+                  <p>Kicker:</p>
+                  <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
+                  <div>
+                    <CheckButton name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onClick={handleChange}>
+                      GOOD
+                    </CheckButton>
+                    {!formData.extraPointGood && (
+                      <CheckButton name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onClick={handleChange}>
+                        FAKE
+                      </CheckButton>
+                    )}
+                  </div>
+                </div>
+              )}
+              {(formData.conversion || formData.extraPointFake) && (
+                <>
+                  <div className="pf-two-point-toggles">
+                    <CheckButton name="twoPointPass" value={!formDisplay.twoPointPass} checked={formDisplay.twoPointPass} onClick={handleDisplay}>
+                      PASS
+                    </CheckButton>
+                    <CheckButton name="twoPointRush" value={!formDisplay.twoPointRush} checked={formDisplay.twoPointRush} onClick={handleDisplay}>
+                      RUSH
+                    </CheckButton>
+                  </div>
+                  <div>
+                    {formDisplay.twoPointPass && (
+                      <>
+                        <p>Passer:</p>
+                        <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
+                        <p>Receiver:</p>
+                        <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
+                      </>
+                    )}
+                    {formDisplay.twoPointRush && (
+                      <>
+                        <p>Rusher:</p>
+                        <PlayerSelect name="conversionRusherId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionRusherId || 'null'} />
+                      </>
+                    )}
+                    <CheckButton name="conversionGood" value={!formData.conversionGood} checked={formData.conversionGood} onClick={handleChange}>
+                      CONVERSION GOOD
+                    </CheckButton>
+                  </div>
+                </>
+              )}
+              {(formData.extraPoint || formData.conversion) && !formData.extraPointGood && !formData.conversionGood && (
+                <div>
+                  <CheckButton name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onClick={handleChange}>
+                    DEFENSIVE CONVERSION
+                  </CheckButton>
+                  {formData.defensiveConversion && (
+                    <>
+                      <p>Returned by</p>
+                      <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       {validatedFormData.gameId === 0 && <div>Play is incomplete or illogical, double check form before submission</div>}
       <div className="pf-buttons">
         <button className="button" type="submit" disabled={validatedFormData.gameId === 0}>

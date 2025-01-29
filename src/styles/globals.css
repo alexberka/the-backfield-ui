@@ -207,13 +207,14 @@ body {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    width: 60%;
+    width: 100%;
     margin: 0 auto;
-    label {
-      font-size: 1.5rem;
+    .check-button {
+      font-size: 1.3rem;
+      width: 40%;
     }
-    input {
-      margin: 0 5px;
+    .check-button.cb-selected {
+      font-size: 1.5rem;
     }
   }
   .playform-game-status {
@@ -427,6 +428,7 @@ body {
 
 .player-select {
   display: inline;
+  width: 150px;
 }
 .player-multi {
   .player-multi-header {
@@ -589,79 +591,6 @@ body {
       }
     }
   }
-  .gamestream-field {
-    position: relative;
-    display: flex;
-    justify-content: space-evenly;
-    width: 604px;
-    height: 267px;
-    /* border: 2px solid #45ff12; */
-    border: 2px solid greenyellow;
-    border-radius: 5px;
-    margin: 10px auto;
-    .gsf-to-gain {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      border: 1px solid #eb5547;
-      left: 50%;
-    }
-    .gsf-drive {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      left: 50%;
-      z-index: -2;
-    }
-    .gsf-ball-on {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      border: 1px solid greenyellow;
-      left: 50%;
-    }
-    .gsf-yardline {
-      height: 100%;
-      width: 0px;
-      border: 1px solid white;
-      z-index: -2;
-    }
-    :nth-child(1 of .gsf-yardline), :nth-last-child(1 of .gsf-yardline) {
-      border: 1px solid greenyellow;
-    }
-    .gsf-home-team-endzone, .gsf-away-team-endzone {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 50px;
-      background: linear-gradient();
-      z-index: -3;
-      p {
-        margin: 0 auto;
-        height: 263px;
-        writing-mode: vertical-rl;
-        text-align: center;
-        vertical-align: center;
-        font-weight: bold;
-        font-size: 1.5rem;
-        text-shadow: 2px 2px black;
-      }
-    }
-    .gsf-away-team-endzone {
-      right: 0;
-      border-radius: 0 3px 3px 0;
-    }
-    .gsf-home-team-endzone {
-      left: 0;
-      border-radius: 3px 0 0 3px;
-      p {
-        transform: rotate(-180deg);
-      }
-    }
-  }
-  .gsf-slim {
-    height: 40px;
-  }
   .gs-last-play {
     width: 800px;
     margin: 0 auto;
@@ -683,6 +612,80 @@ body {
       }
     }
   }
+}
+
+.gamestream-field {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  width: 604px;
+  height: 267px;
+  /* border: 2px solid #45ff12; */
+  border: 2px solid greenyellow;
+  border-radius: 5px;
+  margin: 10px auto;
+  .gsf-to-gain {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border: 1px solid #eb5547;
+    left: 50%;
+  }
+  .gsf-drive {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    left: 50%;
+    z-index: -2;
+  }
+  .gsf-ball-on {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border: 1px solid greenyellow;
+    left: 50%;
+  }
+  .gsf-yardline {
+    height: 100%;
+    width: 0px;
+    border: 1px solid white;
+    z-index: -2;
+  }
+  :nth-child(1 of .gsf-yardline), :nth-last-child(1 of .gsf-yardline) {
+    border: 1px solid greenyellow;
+  }
+  .gsf-home-team-endzone, .gsf-away-team-endzone {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50px;
+    background: linear-gradient();
+    z-index: -3;
+    p {
+      margin: 0 auto;
+      height: 263px;
+      writing-mode: vertical-rl;
+      text-align: center;
+      vertical-align: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px black;
+    }
+  }
+  .gsf-away-team-endzone {
+    right: 0;
+    border-radius: 0 3px 3px 0;
+  }
+  .gsf-home-team-endzone {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+    p {
+      transform: rotate(-180deg);
+    }
+  }
+}
+.gsf-slim {
+  height: 40px;
 }
 
 .stat-bar {
@@ -930,6 +933,39 @@ body {
     justify-content: space-evenly;
     margin-bottom: 5px;
   }
+}
+
+.check-button {
+  font-size: 0.8rem;
+  color: white;
+  color: gray;
+  background: none;
+  border: none;
+  border-top: 2px solid transparent;
+  padding: 0;
+  font-weight: bold;
+}
+.check-button:hover {
+  background: none;
+  border-top: 2px solid greenyellow;
+}
+.check-button.cb-selected {
+  background: none;
+  border-top: 2px solid greenyellow;
+  color: white;
+}
+.check-button.cb-selected:hover {
+  border-top: 2px solid transparent;
+}
+
+.flex {
+  display: flex;
+}
+.flex.evenly {
+  justify-content: space-evenly;
+}
+.width {
+  width: 100%;
 }
 
 .hidden {
