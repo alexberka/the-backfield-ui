@@ -218,14 +218,83 @@ body {
     }
   }
   .playform-game-status {
+    width: 100%;
+    margin: 5px 0 10px;
+    .pf-gs-1 {
+      display: flex;
+      justify-content: space-between;
+      width: 35%;
+      margin: 10px auto;
+      .pf-game-period {
+        display: flex;
+        font-size: 1.2rem;
+        justify-content: right;
+        p {
+          margin: 0 4px;
+        }
+        .pf-game-period-select {
+          width: 50px;
+          height: 30px;
+          font-size: 1.2rem;
+          background: transparent;
+          border: none;
+          border-left: 1px solid gray;
+          color: greenyellow;
+        }
+      }
+    }
+    .pf-gs-2 {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      font-size: 1rem;
+      .pf-down {
+        background: #212121;
+        max-width: fit-content;
+        color: greenyellow;
+        text-align: right;
+        border: none;
+      }
+      .pf-to-go {
+        color: greenyellow;
+      }
+      .playform-line-of-scrimmage {
+        font-size: 1rem;
+        flex-grow: 1;
+      }
+    }
+  }
+  .pf-clock {
     display: flex;
-    .playform-game-period {
-      width: 50px;
+    align-items: top;
+    text-align: right;
+    .pf-clock-label {
+      margin: 0 5px;
+      height: 30px;
+      p {
+        margin: 0;
+        font-weight: bold;
+        font-style: italic;
+        font-size: 0.6rem;
+        align-self: top;
+      }
     }
-    .playform-to-go, .playform-line-of-scrimmage {
-      font-size: 1.2rem; 
-      margin-left: 10px;
+    .playform-timebox {
+      background: none;
+      border: none;
+      width: 3.1rem;
+      font-family: monospace;
+      color: greenyellow;
+      font-size: 1.7rem;
+      height: 30px;
+      outline: 1px solid greenyellow;
     }
+  }
+  .pf-clock-end-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 auto;
+    width: 35%;
   }
   .pf-field-position {
     position: relative;
@@ -318,8 +387,17 @@ body {
   .pf-pass {
     .pf-pass-root {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       align-items: baseline;
+      margin-bottom: 10px;
+    }
+  }
+  .pf-sel-combo {
+    display: flex;
+    gap: 15px;
+    p {
+      margin: 0;
+      color: greenyellow;
     }
   }
   .playform-interception {
@@ -329,20 +407,14 @@ body {
       align-items: baseline;
     }
   }
+  .pf-kicker-plus {
+    display: flex;
+    gap: 20px;
+  }
   .playform-type-radios {
     display: flex;
     justify-content: space-around;
     margin: 10px 0;
-  }
-  .playform-timebox {
-    background: none;
-    border: none;
-    width: 3.1rem;
-    font-family: monospace;
-    color: greenyellow;
-    font-size: 1.7rem;
-    height: 30px;
-    outline: 1px solid greenyellow;
   }
   .pf-creator-header {
     display: flex;
@@ -388,6 +460,7 @@ body {
     .pf-lc-s1 {
       display: flex;
       gap: 10px;
+      margin: 7px 0;
     }
   }
   .pf-creator-collection {
@@ -415,8 +488,15 @@ body {
       border-top: none;
     }
   }
-  label {
-    display: flex;
+  .penalty-select {
+    background: #212121;
+    border-radius: 5px;
+    color: white;
+  }
+  .pf-hr-gray {
+    width: 100%;
+    margin: 10px auto;
+    border-bottom: 1px solid gray;
   }
   .pf-buttons {
     display: flex;
@@ -424,11 +504,22 @@ body {
     width: 100%;
     margin: 10px 0;
   }
+  .player-select {
+    background: #212121;
+    border-radius: 5px;
+    color: white;
+    max-width: 200px;
+  }
+  .input-dark {
+    background: #212121;
+    border: 1px solid gray;
+    color: white;
+    border-radius: 5px;
+  }
 }
 
 .player-select {
   display: inline;
-  width: 150px;
 }
 .player-multi {
   .player-multi-header {
@@ -958,11 +1049,26 @@ body {
   border-top: 2px solid transparent;
 }
 
+.txt-gy {
+  color: greenyellow;
+}
+.txt-rd {
+  color: #eb5547;
+}
 .flex {
   display: flex;
 }
+.flex.around {
+  justify-content: space-around;
+}
 .flex.evenly {
   justify-content: space-evenly;
+}
+.flex.gap-10 {
+  gap: 10px;
+}
+.mbot-10 {
+  margin-bottom: 10px;
 }
 .width {
   width: 100%;

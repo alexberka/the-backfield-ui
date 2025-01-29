@@ -732,76 +732,87 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </CheckButton>
         </div>
         <div className="playform-game-status">
-          <input className="playform-game-period" name="gamePeriod" type="number" min={0} onChange={handleChange} placeholder="Quarter" value={formData.gamePeriod || 0} />
-          <input
-            className="playform-timebox"
-            name="clockStart-minutes"
-            type="number"
-            min={0}
-            max={99}
-            value={Math.floor((formData.clockStart || 0) / 60)
-              .toString()
-              .padStart(2, 0)}
-            onChange={handleClockChange}
-          />
-          <input className="playform-timebox" name="clockStart-seconds" type="number" min={formData.clockStart === 0 ? 0 : -1} max={60} value={((formData.clockStart || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
-          {!formDisplay.kickoff && (
-            <select name="down" onChange={handleChange} value={formData.down} disabled={formDisplay.kickoff}>
-              <option value={0}>No Down</option>
-              <option value={1}>1st</option>
-              <option value={2}>2nd</option>
-              <option value={3}>3rd</option>
-              <option value={4}>4th</option>
-            </select>
-          )}
-          {!!formData.down && !formDisplay.kickoff && <div className="playform-to-go">& {Math.abs(formData.toGain) === 50 ? 'Goal' : (formData.toGain - formData.fieldPositionStart) * (formData.teamId === awayTeam.id ? -1 : 1)}</div>}
-          {formData.fieldPositionStart !== null && (
-            <div className="playform-line-of-scrimmage">
-              {formData.kickoff && 'Ball'} on {fieldPositionToString(formData.fieldPositionStart)}
+          <div className="pf-gs-1">
+            <div className="pf-game-period">
+              <p>Q</p>
+              <input className="pf-game-period-select" name="gamePeriod" type="number" min={0} onChange={handleChange} placeholder="Quarter" value={formData.gamePeriod || 0} />
             </div>
-          )}
+            <div className="pf-clock">
+              <div className="pf-clock-label">
+                <p>CLOCK</p>
+                <p>START</p>
+              </div>
+              <input
+                className="playform-timebox"
+                name="clockStart-minutes"
+                type="number"
+                min={0}
+                max={99}
+                value={Math.floor((formData.clockStart || 0) / 60)
+                  .toString()
+                  .padStart(2, 0)}
+                onChange={handleClockChange}
+              />
+              <input className="playform-timebox" name="clockStart-seconds" type="number" min={formData.clockStart === 0 ? 0 : -1} max={60} value={((formData.clockStart || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
+            </div>
+          </div>
+          <div className="pf-gs-2">
+            {formData.fieldPositionStart !== null && (
+              <div className="playform-line-of-scrimmage">
+                <i className="txt-gy">Starting Field Position</i> {fieldPositionToString(formData.fieldPositionStart)}
+              </div>
+            )}
+            {!formDisplay.kickoff && (
+              <select className="pf-down" name="down" onChange={handleChange} value={formData.down} disabled={formDisplay.kickoff}>
+                <option value={0}>No Down</option>
+                <option value={1}>1st</option>
+                <option value={2}>2nd</option>
+                <option value={3}>3rd</option>
+                <option value={4}>4th</option>
+              </select>
+            )}
+            {!!formData.down && !formDisplay.kickoff && <div className="pf-to-go">& {Math.abs(formData.toGain) === 50 ? 'Goal' : (formData.toGain - formData.fieldPositionStart) * (formData.teamId === awayTeam.id ? -1 : 1)}</div>}
+          </div>
         </div>
         <FieldPositionSlider name="fieldPositionStart" value={formData?.fieldPositionStart} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'home' : 'away'} clearOption={false} />
         {formData.down !== 0 && !formDisplay.kickoff && (
           <div>
             <div>
-              <i>To Gain</i> {fieldPositionToString(formData.toGain)}
+              <i className="txt-rd">To Gain</i> {fieldPositionToString(formData.toGain)}
             </div>
             <FieldPositionSlider name="toGain" value={formData?.toGain} onChange={handleChange} color="red" clearOption={false} />
           </div>
         )}
       </div>
       <div className="pf-section">
-        <input
-          className="playform-timebox"
-          name="clockEnd-minutes"
-          type="number"
-          min={0}
-          max={Math.floor((formData.clockStart || 0) / 60)}
-          value={
-            formData.clockEnd === null
-              ? ''
-              : Math.floor((formData.clockEnd || 0) / 60)
-                  .toString()
-                  .padStart(2, 0)
-          }
-          onChange={handleClockChange}
-        />
-        <input className="playform-timebox" name="clockEnd-seconds" type="number" min={!formData.clockEnd ? 0 : -1} max={formData.clockEnd < formData.clockStart ? 60 : (formData.clockStart || 0) % 60} value={formData.clockEnd === null ? '' : ((formData.clockEnd || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
-        {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === -50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === 50)) && <p>Safety, +2 {playerWithBall.teamId === homeTeam.id ? `${awayTeam.locationName} ${awayTeam.nickname}` : `${homeTeam.locationName} ${homeTeam.nickname}`}!</p>}
-        {validatedFormData.touchdownPlayerId && (
-          <>
-            <p>
-              +{6 + (validatedFormData?.extraPointGood ? 1 : 0) + (validatedFormData?.conversionGood ? 2 : 0)} {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!
-            </p>
-            {validatedFormData?.defensiveConversion && <p>+2 {playerWithBall.teamId === awayTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
-          </>
-        )}
-        {validatedFormData.kickGood && <p>+3 {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
+        <div className="pf-clock-end-wrapper">
+          <div className="pf-clock end">
+            <div className="pf-clock-label">
+              <p>CLOCK</p>
+              <p>END</p>
+            </div>
+            <input
+              className="playform-timebox"
+              name="clockEnd-minutes"
+              type="number"
+              min={0}
+              max={Math.floor((formData.clockStart || 0) / 60)}
+              value={
+                formData.clockEnd === null
+                  ? ''
+                  : Math.floor((formData.clockEnd || 0) / 60)
+                      .toString()
+                      .padStart(2, 0)
+              }
+              onChange={handleClockChange}
+            />
+            <input className="playform-timebox" name="clockEnd-seconds" type="number" min={!formData.clockEnd ? 0 : -1} max={formData.clockEnd < formData.clockStart ? 60 : (formData.clockStart || 0) % 60} value={formData.clockEnd === null ? '' : ((formData.clockEnd || 0) % 60).toString().padStart(2, '0')} onChange={handleClockChange} />
+          </div>
+        </div>
         {(!formDisplay.fieldGoal || (formDisplay.fieldGoal && (formData.kickFake || formDisplay.kickBlocked))) && !(formDisplay.kickoff && formData.kickTouchback) && (
           <div>
             <div>
-              <i>Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 && !formDisplay.interception ? formData.fieldPositionStart : formData.fieldPositionEnd)}
+              <i className="txt-gy">Ending Field Position</i> {fieldPositionToString(formDisplay.pass && !formData?.completion && formData.tacklerIds.length === 0 && !formDisplay.interception ? formData.fieldPositionStart : formData.fieldPositionEnd)}
             </div>
             {(!formDisplay.pass || formData.completion || formData.tacklerIds.length > 0 || formDisplay.interception) && <FieldPositionSlider name="fieldPositionEnd" value={formData.fieldPositionEnd} onChange={handleChange} possession={playerWithBall.teamId && (playerWithBall.teamId === homeTeam.id ? 'home' : 'away')} />}
           </div>
@@ -841,122 +852,139 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       <div className={formDisplay.punt || formDisplay.fieldGoal ? 'pf-section' : ''}>
         {formDisplay.punt && (
           <div className="pf-punt">
-            <p>Kicker:</p>
-            <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
-            <CheckButton
-              name="kickFake"
-              value={!formData.kickFake}
-              checked={formData.kickFake}
-              onClick={(e) => {
-                handleChange(e);
-                if (e.target.value === 'true') {
-                  selectiveReset(['kickFieldedAt', 'kickReturnerId', 'kickFairCatch', 'kickTouchback']);
-                }
-                if (e.target.value === 'false') {
-                  handleDisplay(e);
-                }
-              }}
-            >
-              FAKE
-            </CheckButton>
-            {!formData.kickFake && (
-              <div>
-                <p>Returner:</p>
-                <PlayerSelect name="kickReturnerId" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickReturnerId || 'null'} />
+            <div className="pf-kicker-plus mbot-10">
+              <div className="pf-sel-combo">
+                <p>Kicker</p>
+                <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
               </div>
-            )}
-            {!formData.kickFake && (
-              <div>
-                <CheckButton
-                  name="kickTouchback"
-                  value={!formData.kickTouchback}
-                  checked={formData.kickTouchback}
-                  onClick={(e) => {
-                    handleChange(e);
-                    selectiveReset(['kickFieldedAt']);
-                  }}
-                >
-                  TOUCHBACK
-                </CheckButton>
-                <CheckButton
-                  name="kickFairCatch"
-                  value={!formData.kickFairCatch}
-                  checked={formData.kickFairCatch}
-                  onClick={(e) => {
-                    handleChange(e);
-                    selectiveReset(['kickFieldedAt']);
-                  }}
-                >
-                  FAIR CATCH
-                </CheckButton>
-              </div>
-            )}
-            {!formData.kickFake && (
+              <CheckButton
+                name="kickFake"
+                value={!formData.kickFake}
+                checked={formData.kickFake}
+                onClick={(e) => {
+                  handleChange(e);
+                  if (e.target.value === 'true') {
+                    selectiveReset(['kickFieldedAt', 'kickReturnerId', 'kickFairCatch', 'kickTouchback']);
+                  }
+                  if (e.target.value === 'false') {
+                    handleDisplay(e);
+                  }
+                }}
+              >
+                FAKE{!formData.kickFake && '?'}
+              </CheckButton>
+            </div>
+            {!formData.kickFake && !formDisplay.kickBlocked && (
               <>
-                <div>
-                  <i>Fielded at</i> {fieldPositionToString(formData.kickFieldedAt)}
+                <div className="pf-sel-combo mbot-10">
+                  <p>Returner</p>
+                  <PlayerSelect name="kickReturnerId" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickReturnerId || 'null'} />
                 </div>
-                <FieldPositionSlider name="kickFieldedAt" value={formData?.kickFieldedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
+                <div className="flex evenly width">
+                  <CheckButton
+                    name="kickTouchback"
+                    value={!formData.kickTouchback}
+                    checked={formData.kickTouchback}
+                    onClick={(e) => {
+                      handleChange(e);
+                      selectiveReset(['kickFieldedAt', 'kickFairCatch']);
+                    }}
+                  >
+                    TOUCHBACK
+                  </CheckButton>
+                  <CheckButton
+                    name="kickFairCatch"
+                    value={!formData.kickFairCatch}
+                    checked={formData.kickFairCatch}
+                    onClick={(e) => {
+                      handleChange(e);
+                      selectiveReset(['kickFieldedAt', 'kickTouchback']);
+                    }}
+                  >
+                    FAIR CATCH
+                  </CheckButton>
+                </div>
+                {!formData.kickTouchback && (
+                  <>
+                    <div>
+                      <span className="txt-gy">Fielded at</span> {fieldPositionToString(formData.kickFieldedAt)}
+                    </div>
+                    <FieldPositionSlider name="kickFieldedAt" value={formData?.kickFieldedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
+                  </>
+                )}
               </>
             )}
           </div>
         )}
         {formDisplay.fieldGoal && (
           <div className="pf-fieldgoal">
-            <p>Kicker:</p>
-            <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
-            <CheckButton
-              name="kickFake"
-              value={!formData.kickFake}
-              checked={formData.kickFake}
-              onClick={(e) => {
-                handleChange(e);
-                if (e.target.value === 'true') {
-                  selectiveReset(['kickGood']);
-                }
-                if (e.target.value === 'false') {
-                  handleDisplay(e);
-                }
-              }}
-            >
-              FAKE
-            </CheckButton>
-            {!formData.kickFake && (
+            <div className="pf-kicker-plus">
+              <div className="pf-sel-combo">
+                <p>Kicker</p>
+                <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
+              </div>
               <CheckButton
-                name="kickGood"
-                value={!formData.kickGood}
-                checked={formData.kickGood}
+                name="kickFake"
+                value={!formData.kickFake}
+                checked={formData.kickFake}
                 onClick={(e) => {
-                  handleDisplay({ target: { name: 'kickBlocked', value: 'false' } });
                   handleChange(e);
+                  if (e.target.value === 'true') {
+                    selectiveReset(['kickGood']);
+                  }
+                  if (e.target.value === 'false') {
+                    handleDisplay(e);
+                  }
                 }}
               >
-                GOOD
+                FAKE
               </CheckButton>
-            )}
+              {!formData.kickFake && (
+                <CheckButton
+                  name="kickGood"
+                  value={!formData.kickGood}
+                  checked={formData.kickGood}
+                  onClick={(e) => {
+                    handleDisplay({ target: { name: 'kickBlocked', value: 'false' } });
+                    handleChange(e);
+                  }}
+                >
+                  GOOD
+                </CheckButton>
+              )}
+            </div>
           </div>
         )}
         {(formDisplay.fieldGoal || formDisplay.punt) && !formData.kickFake && (
           <div className="pf-kickblock">
-            <CheckButton
-              name="kickBlocked"
-              value={!formDisplay.kickBlocked}
-              checked={formDisplay.kickBlocked}
-              onClick={(e) => {
-                selectiveReset(['kickGood']);
-                handleDisplay(e);
-              }}
-            >
-              BLOCKED
-            </CheckButton>
+            <div className="pf-hr-gray" />
+            <div className={`flex evenly width ${formDisplay.kickBlocked && 'mbot-10'}`}>
+              <CheckButton
+                name="kickBlocked"
+                value={!formDisplay.kickBlocked}
+                checked={formDisplay.kickBlocked}
+                onClick={(e) => {
+                  selectiveReset(['kickGood']);
+                  handleDisplay(e);
+                }}
+              >
+                BLOCKED{!formDisplay.kickBlocked && '?'}
+              </CheckButton>
+            </div>
             {formDisplay.kickBlocked && (
               <>
                 <div>
-                  <p>Blocked by</p>
-                  <PlayerSelect name="kickBlockedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickBlockedById || 'null'} />
-                  <p>Recovered by</p>
-                  <PlayerSelect name="kickBlockRecoveredById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleChange} value={formData.kickBlockRecoveredById || 'null'} />
-                  <div>at {fieldPositionToString(formData.kickBlockRecoveredAt)}</div>
+                  <div className="pf-sel-combo mbot-10">
+                    <p>Blocked by</p>
+                    <PlayerSelect name="kickBlockedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickBlockedById || 'null'} />
+                  </div>
+                  <div className="pf-sel-combo mbot-10">
+                    <p>Recovered by</p>
+                    <PlayerSelect name="kickBlockRecoveredById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleChange} value={formData.kickBlockRecoveredById || 'null'} />
+                    <div>
+                      <span className="txt-gy">at</span> {fieldPositionToString(formData.kickBlockRecoveredAt)}
+                    </div>
+                  </div>
                 </div>
                 <FieldPositionSlider name="kickBlockRecoveredAt" value={formData?.kickBlockRecoveredAt} onChange={handleChange} possession={playerById(formData.kickBlockRecoveredById)?.teamId === homeTeam.id ? 'home' : 'away'} />
               </>
@@ -964,14 +992,17 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
         )}
         {(formDisplay.fieldGoal || formDisplay.punt) && formData.kickFake && (
-          <div className="pf-fake-play-toggles">
-            <CheckButton name="fakeToPass" value={!formDisplay.fakeToPass} checked={formDisplay.fakeToPass} onClick={handleDisplay}>
-              PASS
-            </CheckButton>
-            <CheckButton name="fakeToRush" value={!formDisplay.fakeToRush} checked={formDisplay.fakeToRush} onClick={handleDisplay}>
-              RUSH
-            </CheckButton>
-          </div>
+          <>
+            <div className="pf-hr-gray" />
+            <div className="flex width evenly">
+              <CheckButton name="fakeToPass" value={!formDisplay.fakeToPass} checked={formDisplay.fakeToPass} onClick={handleDisplay}>
+                PASS
+              </CheckButton>
+              <CheckButton name="fakeToRush" value={!formDisplay.fakeToRush} checked={formDisplay.fakeToRush} onClick={handleDisplay}>
+                RUSH
+              </CheckButton>
+            </div>
+          </>
         )}
       </div>
       {(formDisplay.pass || formDisplay.fakeToPass) && (
@@ -979,10 +1010,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           <div className="pf-section">
             <div className="pf-pass">
               <div className="pf-pass-root">
-                <p>Passer:</p>
-                <PlayerSelect name="passerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.passerId || 'null'} />
-                <p>Receiver:</p>
-                <PlayerSelect name="receiverId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.receiverId || 'null'} />
+                <div className="pf-sel-combo">
+                  <p>Passer</p>
+                  <PlayerSelect name="passerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.passerId || 'null'} />
+                </div>
+                <div className="pf-sel-combo">
+                  <p>Receiver</p>
+                  <PlayerSelect name="receiverId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.receiverId || 'null'} />
+                </div>
               </div>
               <div className="flex width evenly">
                 <CheckButton
@@ -1010,14 +1045,19 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                 </CheckButton>
               </div>
               {formDisplay?.interception && (
-                <div className="playform-interception">
-                  <div className="pf-int-statline">
-                    <p>Intercepted by</p>
-                    <PlayerSelect name="interceptedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.interceptedById || 'null'} />
-                    <div>at {fieldPositionToString(formData.interceptedAt)}</div>
+                <>
+                  <div className="pf-hr-gray" />
+                  <div className="playform-interception">
+                    <div className="pf-int-statline pf-sel-combo mbot-10">
+                      <p>Intercepted by</p>
+                      <PlayerSelect name="interceptedById" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.interceptedById || 'null'} />
+                      <div>
+                        <span className="txt-gy">at </span> {fieldPositionToString(formData.interceptedAt)}
+                      </div>
+                    </div>
+                    <FieldPositionSlider name="interceptedAt" value={formData?.interceptedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
                   </div>
-                  <FieldPositionSlider name="interceptedAt" value={formData?.interceptedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
-                </div>
+                </>
               )}
             </div>
           </div>
@@ -1030,8 +1070,8 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       )}
       {(formDisplay.rush || formDisplay.fakeToRush) && (
         <div className="pf-section">
-          <div className="pf-rush">
-            <p>Rusher:</p>
+          <div className="pf-sel-combo">
+            <p>Rusher</p>
             <PlayerSelect name="rusherId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.rusherId || 'null'} />
           </div>
         </div>
@@ -1039,25 +1079,33 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       {formDisplay.kickoff && (
         <div className="pf-section">
           <div className="pf-kickoff">
-            <p>Kicker:</p>
-            <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
-            <p>Returner:</p>
-            <PlayerSelect name="kickReturnerId" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickReturnerId || 'null'} />
-            <CheckButton
-              name="kickTouchback"
-              value={!formData.kickTouchback}
-              checked={formData.kickTouchback}
-              onClick={(e) => {
-                handleChange(e);
-                handleChange({ target: { name: 'kickFieldedAt', value: 'null' } });
-              }}
-            >
-              TOUCHBACK
-            </CheckButton>
+            <div className="flex around width mbot-10">
+              <div className="pf-sel-combo">
+                <p>Kicker</p>
+                <PlayerSelect name="kickerId" players={(formData.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.kickerId || 'null'} />
+              </div>
+              <div className="pf-sel-combo">
+                <p>Returner</p>
+                <PlayerSelect name="kickReturnerId" players={(formData.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.kickReturnerId || 'null'} />
+              </div>
+            </div>
+            <div className="flex evenly width">
+              <CheckButton
+                name="kickTouchback"
+                value={!formData.kickTouchback}
+                checked={formData.kickTouchback}
+                onClick={(e) => {
+                  handleChange(e);
+                  handleChange({ target: { name: 'kickFieldedAt', value: 'null' } });
+                }}
+              >
+                TOUCHBACK{!formData.kickTouchback && '?'}
+              </CheckButton>
+            </div>
             {!formData.kickTouchback && (
               <div>
                 <div>
-                  <i>Fielded at</i> {fieldPositionToString(formData.kickFieldedAt)}
+                  <span className="txt-gy">Fielded at</span> {fieldPositionToString(formData.kickFieldedAt)}
                 </div>
                 <FieldPositionSlider name="kickFieldedAt" value={formData?.kickFieldedAt} onChange={handleChange} possession={formData.teamId === homeTeam.id ? 'away' : 'home'} />
               </div>
@@ -1075,16 +1123,22 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
           {formDisplay.lateralCreator && (
             <div className="pf-creator-form">
-              <div className="pf-lc-s1">
+              <div className="pf-lc-s1 pf-sel-combo">
                 <p>From</p>
                 <PlayerSelect name="prevCarrierId" players={[...(playerById(lateralCreator.newCarrierId)?.teamId === awayTeam.id ? [] : homeTeam.players.filter((p) => p.id !== lateralCreator.newCarrierId)), ...(playerById(lateralCreator.newCarrierId)?.teamId === homeTeam.id ? [] : awayTeam.players.filter((p) => p.id !== lateralCreator.newCarrierId))]} onChange={handleLateralChange} value={lateralCreator.prevCarrierId || 'null'} />
                 <p>to</p>
                 <PlayerSelect name="newCarrierId" players={[...(playerById(lateralCreator.prevCarrierId)?.teamId === awayTeam.id ? [] : homeTeam.players.filter((p) => p.id !== lateralCreator.prevCarrierId)), ...(playerById(lateralCreator.prevCarrierId)?.teamId === homeTeam.id ? [] : awayTeam.players.filter((p) => p.id !== lateralCreator.prevCarrierId))]} onChange={handleLateralChange} value={lateralCreator.newCarrierId || 'null'} />
               </div>
-              <p>at {fieldPositionToString(lateralCreator.possessionAt)}</p>
+              <p>
+                <span className="txt-gy">at </span>
+                {fieldPositionToString(lateralCreator.possessionAt)}
+              </p>
               <FieldPositionSlider name="possessionAt" value={lateralCreator?.possessionAt} onChange={handleLateralChange} possession={lateralCreator.newCarrierId && (playerById(lateralCreator.newCarrierId).teamId === homeTeam.id ? 'home' : 'away')} />
-              <p>Advanced to {fieldPositionToString(lateralCreator.carriedTo)}</p>
+              <p>
+                <span className="txt-gy">Advanced to</span> {fieldPositionToString(lateralCreator.carriedTo)}
+              </p>
               <FieldPositionSlider name="carriedTo" value={lateralCreator?.carriedTo} onChange={handleLateralChange} possession={lateralCreator.newCarrierId && (playerById(lateralCreator.newCarrierId).teamId === homeTeam.id ? 'home' : 'away')} />
+              <div className="pf-hr-gray" />
               <button type="button" className="pf-creator-form-add" onClick={handleLateralAdd}>
                 Add
               </button>
@@ -1100,8 +1154,25 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                     X
                   </button>
                   <p>
-                    {prevCarrier.lastName}, {prevCarrier?.firstName[0]}. #{prevCarrier.jerseyNumber} lateral to {newCarrier.lastName}, {newCarrier?.firstName[0]}. #{newCarrier.jerseyNumber}
-                    {l.possessionAt !== null ? ` at ${fieldPositionToString(l.possessionAt)}` : ''}.{l.carriedTo !== null && l.possessionAt != null && ` Advanced ${(l.carriedTo - l.possessionAt) * (newCarrier.teamId === homeTeam.id ? 1 : -1)} yard${Math.abs(l.carriedTo - l.possessionAt) !== 1 && 's'} to ${fieldPositionToString(l.carriedTo)}.`}
+                    {prevCarrier.lastName}, {prevCarrier?.firstName[0]}. #{prevCarrier.jerseyNumber} <span className="txt-gy">lateral to</span> {newCarrier.lastName}, {newCarrier?.firstName[0]}. #{newCarrier.jerseyNumber}
+                    {l.possessionAt !== null ? (
+                      <span>
+                        {' '}
+                        <span className="txt-gy">at </span> {fieldPositionToString(l.possessionAt)}
+                      </span>
+                    ) : (
+                      ''
+                    )}
+                    .
+                    {l.carriedTo !== null && l.possessionAt != null && (
+                      <span>
+                        {' '}
+                        <span className="txt-gy">
+                          Advanced {(l.carriedTo - l.possessionAt) * (newCarrier.teamId === homeTeam.id ? 1 : -1)} yard{Math.abs(l.carriedTo - l.possessionAt) !== 1 && 's'} to{' '}
+                        </span>
+                        {fieldPositionToString(l.carriedTo)}.
+                      </span>
+                    )}
                   </p>
                 </div>
               );
@@ -1119,16 +1190,29 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
           {formDisplay.fumbleCreator && (
             <div className="pf-creator-form">
-              <p>Committed by</p>
-              <PlayerSelect name="fumbleCommittedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleCommittedById || 'null'} />
-              <p>Forced by</p>
-              <PlayerSelect name="fumbleForcedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleForcedById || 'null'} />
-              <p>at {fieldPositionToString(fumbleCreator.fumbledAt)}</p>
+              <div className="flex width gap-10">
+                <div className="pf-sel-combo">
+                  <p>Committed by</p>
+                  <PlayerSelect name="fumbleCommittedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleCommittedById || 'null'} />
+                </div>
+                <div className="pf-sel-combo">
+                  <p>Forced by</p>
+                  <PlayerSelect name="fumbleForcedById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleForcedById || 'null'} />
+                </div>
+              </div>
+              <div>
+                <span className="txt-gy">at</span> {fieldPositionToString(fumbleCreator.fumbledAt)}
+              </div>
               <FieldPositionSlider name="fumbledAt" value={fumbleCreator?.fumbledAt} onChange={handleFumbleChange} possession={fumbleCreator.fumbleCommittedById && (playerById(fumbleCreator.fumbleCommittedById).teamId === homeTeam.id ? 'home' : 'away')} />
-              <p>Recovered by</p>
-              <PlayerSelect name="fumbleRecoveredById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleRecoveredById || 'null'} />
-              <p>at {fieldPositionToString(fumbleCreator.fumbleRecoveredAt)}</p>
+              <div className="pf-sel-combo mbot-10">
+                <p>Recovered by</p>
+                <PlayerSelect name="fumbleRecoveredById" players={[...homeTeam.players, ...awayTeam.players]} onChange={handleFumbleChange} value={fumbleCreator.fumbleRecoveredById || 'null'} />
+                <div>
+                  <span className="txt-gy">at</span> {fieldPositionToString(fumbleCreator.fumbleRecoveredAt)}
+                </div>
+              </div>
               <FieldPositionSlider name="fumbleRecoveredAt" value={fumbleCreator?.fumbleRecoveredAt} onChange={handleFumbleChange} possession={fumbleCreator.fumbleRecoveredById && (playerById(fumbleCreator.fumbleRecoveredById).teamId === homeTeam.id ? 'home' : 'away')} />
+              <div className="pf-hr-gray" />
               <button className="pf-creator-form-add" type="button" onClick={handleFumbleAdd}>
                 Add
               </button>
@@ -1145,11 +1229,37 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                     X
                   </button>
                   <p>
-                    {committedBy.lastName}, {committedBy?.firstName[0]}. #{committedBy.jerseyNumber} fumble{f.fumbledAt !== null ? ` at ${fieldPositionToString(f.fumbledAt)}` : ''}
-                    {forcedBy.id !== undefined && `, Forced by ${forcedBy.lastName}, ${forcedBy?.firstName[0]}. #${forcedBy.jerseyNumber}`}
-                    {recoveredBy.id !== undefined &&
-                      `, Recovered by ${recoveredBy.lastName}, ${recoveredBy?.firstName[0]}. #${recoveredBy.jerseyNumber}
-                        ${f.fumbleRecoveredAt !== null ? ` at ${fieldPositionToString(f.fumbleRecoveredAt)}` : ''}`}
+                    {committedBy.lastName}, {committedBy?.firstName[0]}. #{committedBy.jerseyNumber} <span className="txt-gy">fumble</span>
+                    {f.fumbledAt !== null ? (
+                      <span>
+                        <span className="txt-gy"> at </span>
+                        {fieldPositionToString(f.fumbledAt)}
+                      </span>
+                    ) : (
+                      ''
+                    )}
+                    {forcedBy.id !== undefined && (
+                      <span>
+                        <span className="txt-gy">. Forced by</span> {forcedBy.lastName}, {forcedBy?.firstName[0]}. #{forcedBy.jerseyNumber}
+                      </span>
+                    )}
+                    {recoveredBy.id !== undefined && (
+                      <>
+                        <span>
+                          <span className="txt-gy">. Recovered by </span>
+                          {recoveredBy.lastName}, {recoveredBy?.firstName[0]}. #{recoveredBy.jerseyNumber}
+                        </span>
+                        {f.fumbleRecoveredAt !== null ? (
+                          <span>
+                            <span className="txt-gy"> at </span>
+                            {fieldPositionToString(f.fumbleRecoveredAt)}
+                          </span>
+                        ) : (
+                          ''
+                        )}
+                      </>
+                    )}
+                    <span className="txt-gy">.</span>
                   </p>
                 </div>
               );
@@ -1168,14 +1278,20 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
           </div>
           {formDisplay.penaltyCreator && (
             <div className="pf-creator-form">
-              <select className="penalty-select" name="penaltyId" onChange={handlePlayPenaltyChange} value={penaltyCreator.penaltyId || 1}>
-                {penalties.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <div>
+              <div className="flex evenly mbot-10">
+                <select className="penalty-select" name="penaltyId" onChange={handlePlayPenaltyChange} value={penaltyCreator.penaltyId || 1}>
+                  {penalties.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex evenly mbot-10">
+                <div className="pf-sel-combo">
+                  <p>Penalized Player</p>
+                  <PlayerSelect name="playerId" players={[...(penaltyCreator.teamId !== homeTeam.id ? awayTeam.players : []), ...(penaltyCreator.teamId !== awayTeam.id ? homeTeam.players : [])]} onChange={handlePlayPenaltyChange} value={penaltyCreator.playerId || 'null'} />
+                </div>
                 <CheckButton name="teamId-penalty" value={homeTeam.id} checked={penaltyCreator.teamId === homeTeam.id} onClick={handlePlayPenaltyChange}>
                   {homeTeam.locationName.toUpperCase()}
                 </CheckButton>
@@ -1183,32 +1299,38 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                   {awayTeam.locationName.toUpperCase()}
                 </CheckButton>
               </div>
-              <p>Penalized Player</p>
-              <PlayerSelect name="playerId" players={[...(penaltyCreator.teamId !== homeTeam.id ? awayTeam.players : []), ...(penaltyCreator.teamId !== awayTeam.id ? homeTeam.players : [])]} onChange={handlePlayPenaltyChange} value={penaltyCreator.playerId || 'null'} />
-              <CheckButton name="enforced" value={!penaltyCreator.enforced} checked={penaltyCreator.enforced} onClick={handlePlayPenaltyChange}>
-                ENFORCED{!penaltyCreator.enforced && '?'}
-              </CheckButton>
-              {penaltyCreator.enforced && (
-                <>
-                  <p>Enforced at {fieldPositionToString(penaltyCreator.enforcedFrom)}</p>
-                  <FieldPositionSlider name="enforcedFrom" value={penaltyCreator?.enforcedFrom} onChange={handlePlayPenaltyChange} possession={penaltyCreator.teamId !== null && (penaltyCreator.teamId === homeTeam.id ? 'away' : 'home')} />
-                  <label>
-                    <p>Yardage</p>
-                    <input type="number" name="yardage" min={0} max={100} value={penaltyCreator.yardage || 0} onChange={handlePlayPenaltyChange} />
-                  </label>
-                </>
-              )}
-              <div className="flex evenly width">
-                <CheckButton name="noPlay" value={!penaltyCreator.noPlay} checked={penaltyCreator.noPlay} onClick={handlePlayPenaltyChange}>
-                  NO PLAY
-                </CheckButton>
-                <CheckButton name="lossOfDown" value={!penaltyCreator.lossOfDown} checked={penaltyCreator.lossOfDown} onClick={handlePlayPenaltyChange}>
-                  LOSS OF DOWN
-                </CheckButton>
-                <CheckButton name="autoFirstDown" value={!penaltyCreator.autoFirstDown} checked={penaltyCreator.autoFirstDown} onClick={handlePlayPenaltyChange}>
-                  AUTOMATIC FIRST DOWN
+              <div className="pf-hr-gray" />
+              <div className="flex evenly">
+                <CheckButton name="enforced" value={!penaltyCreator.enforced} checked={penaltyCreator.enforced} onClick={handlePlayPenaltyChange}>
+                  ENFORCED{!penaltyCreator.enforced && '?'}
                 </CheckButton>
               </div>
+              {penaltyCreator.enforced && (
+                <>
+                  <div className="mbot-10">
+                    <p>
+                      <span className="txt-gy">Enforced at</span> {fieldPositionToString(penaltyCreator.enforcedFrom)}
+                    </p>
+                    <FieldPositionSlider name="enforcedFrom" value={penaltyCreator?.enforcedFrom} onChange={handlePlayPenaltyChange} possession={penaltyCreator.teamId !== null && (penaltyCreator.teamId === homeTeam.id ? 'away' : 'home')} />
+                  </div>
+                  <div className="flex evenly width">
+                    <label className="flex gap-10">
+                      <p className="txt-gy">Yardage</p>
+                      <input className="input-dark" type="number" name="yardage" min={0} max={100} value={penaltyCreator.yardage || 0} onChange={handlePlayPenaltyChange} />
+                    </label>
+                    <CheckButton name="noPlay" value={!penaltyCreator.noPlay} checked={penaltyCreator.noPlay} onClick={handlePlayPenaltyChange}>
+                      NO PLAY
+                    </CheckButton>
+                    <CheckButton name="lossOfDown" value={!penaltyCreator.lossOfDown} checked={penaltyCreator.lossOfDown} onClick={handlePlayPenaltyChange}>
+                      LOSS OF DOWN
+                    </CheckButton>
+                    <CheckButton name="autoFirstDown" value={!penaltyCreator.autoFirstDown} checked={penaltyCreator.autoFirstDown} onClick={handlePlayPenaltyChange}>
+                      AUTOMATIC FIRST DOWN
+                    </CheckButton>
+                  </div>
+                </>
+              )}
+              <div className="pf-hr-gray" />
               <button type="button" className="pf-creator-form-add" onClick={handlePlayPenaltyAdd}>
                 Add
               </button>
@@ -1218,7 +1340,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
             {formData.penalties.map((pp) => {
               const player = playerById(pp.playerId);
               const penaltyIndex = penalties.findIndex((penalty) => penalty.id === pp.penaltyId);
-              const playPenaltyName = penalties[penaltyIndex].name;
+              const playPenaltyName = penalties[penaltyIndex]?.name;
               const teamName = pp.teamId === homeTeam.id ? homeTeam.locationName : awayTeam.locationName;
               return (
                 <div key={pp.id} className="pf-creator-collection-item">
@@ -1237,18 +1359,21 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
       </div>
       {((playerWithBall.teamId === homeTeam.id && formData.fieldPositionEnd === 50) || (playerWithBall.teamId === awayTeam.id && formData.fieldPositionEnd === -50)) && !(formDisplay.fieldGoal && formData.kickGood) && (
         <div className="pf-section">
-          <CheckButton
-            name="touchdown"
-            value={!formDisplay.touchdown}
-            checked={formDisplay.touchdown}
-            onClick={(e) => {
-              handleDisplay(e);
-            }}
-          >
-            TOUCHDOWN{formDisplay.touchdown ? '!' : '?'}
-          </CheckButton>
+          <div className="flex evenly">
+            <CheckButton
+              name="touchdown"
+              value={!formDisplay.touchdown}
+              checked={formDisplay.touchdown}
+              onClick={(e) => {
+                handleDisplay(e);
+              }}
+            >
+              TOUCHDOWN{formDisplay.touchdown ? '!' : '?'}
+            </CheckButton>
+          </div>
           {formDisplay.touchdown && (
-            <div>
+            <>
+              <div className="pf-hr-gray" />
               <div className="pf-touchdown-toggles flex evenly width">
                 <CheckButton
                   name="extraPoint"
@@ -1281,25 +1406,26 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                   2PT CONVERSION
                 </CheckButton>
               </div>
-              {formData.extraPoint && (
-                <div>
-                  <p>Kicker:</p>
-                  <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
-                  <div>
-                    <CheckButton name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onClick={handleChange}>
-                      GOOD
-                    </CheckButton>
-                    {!formData.extraPointGood && (
-                      <CheckButton name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onClick={handleChange}>
-                        FAKE
-                      </CheckButton>
-                    )}
+              {(validatedFormData.extraPoint || validatedFormData.conversion) && <div className="pf-hr-gray" />}
+              {validatedFormData.extraPoint && (
+                <div className="pf-kicker-plus">
+                  <div className="pf-sel-combo">
+                    <p>Kicker</p>
+                    <PlayerSelect name="extraPointKickerId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.extraPointKickerId || 'null'} />
                   </div>
+                  <CheckButton name="extraPointGood" value={!formData.extraPointGood} checked={formData.extraPointGood} onClick={handleChange}>
+                    GOOD
+                  </CheckButton>
+                  {!validatedFormData.extraPointGood && (
+                    <CheckButton name="extraPointFake" value={!formData.extraPointFake} checked={formData.extraPointFake} onClick={handleChange}>
+                      FAKE
+                    </CheckButton>
+                  )}
                 </div>
               )}
-              {(formData.conversion || formData.extraPointFake) && (
+              {(validatedFormData.conversion || validatedFormData.extraPointFake) && (
                 <>
-                  <div className="pf-two-point-toggles">
+                  <div className="flex evenly width mbot-10">
                     <CheckButton name="twoPointPass" value={!formDisplay.twoPointPass} checked={formDisplay.twoPointPass} onClick={handleDisplay}>
                       PASS
                     </CheckButton>
@@ -1309,12 +1435,16 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                   </div>
                   <div>
                     {formDisplay.twoPointPass && (
-                      <>
-                        <p>Passer:</p>
-                        <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
-                        <p>Receiver:</p>
-                        <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
-                      </>
+                      <div className="flex around">
+                        <div className="pf-sel-combo">
+                          <p>Passer</p>
+                          <PlayerSelect name="conversionPasserId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionPasserId || 'null'} />
+                        </div>
+                        <div className="pf-sel-combo">
+                          <p>Receiver</p>
+                          <PlayerSelect name="conversionReceiverId" players={(playerWithBall.teamId === homeTeam.id ? homeTeam : awayTeam).players} onChange={handleChange} value={formData.conversionReceiverId || 'null'} />
+                        </div>
+                      </div>
                     )}
                     {formDisplay.twoPointRush && (
                       <>
@@ -1328,24 +1458,38 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                   </div>
                 </>
               )}
-              {(formData.extraPoint || formData.conversion) && !formData.extraPointGood && !formData.conversionGood && (
-                <div>
-                  <CheckButton name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onClick={handleChange}>
-                    DEFENSIVE CONVERSION
-                  </CheckButton>
-                  {formData.defensiveConversion && (
-                    <>
-                      <p>Returned by</p>
-                      <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+              <div className="flex evenly width">
+                {(formData.extraPoint || formData.conversion) && !formData.extraPointGood && !formData.conversionGood && (
+                  <div>
+                    <CheckButton name="defensiveConversion" value={!formData.defensiveConversion} checked={formData.defensiveConversion} onClick={handleChange}>
+                      DEFENSIVE CONVERSION
+                    </CheckButton>
+                    {formData.defensiveConversion && (
+                      <>
+                        <p>Returned by</p>
+                        <PlayerSelect name="conversionReturnerId" players={(playerWithBall.teamId === homeTeam.id ? awayTeam : homeTeam).players} onChange={handleChange} value={formData.conversionReturnerId || 'null'} />
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}
-      {validatedFormData.gameId === 0 && <div>Play is incomplete or illogical, double check form before submission</div>}
+      <div className="pf-end-status">
+        {validatedFormData.gameId === 0 && <p>Play is incomplete or illogical, double check form before submission</p>}
+        {validatedFormData.safety && <p>Safety, +2 {playerWithBall.teamId === homeTeam.id ? `${awayTeam.locationName} ${awayTeam.nickname}` : `${homeTeam.locationName} ${homeTeam.nickname}`}!</p>}
+        {validatedFormData.touchdownPlayerId && (
+          <>
+            <p>
+              +{6 + (validatedFormData?.extraPointGood ? 1 : 0) + (validatedFormData?.conversionGood ? 2 : 0)} {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!
+            </p>
+            {validatedFormData?.defensiveConversion && <p>+2 {playerWithBall.teamId === awayTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
+          </>
+        )}
+        {validatedFormData.kickGood && <p>+3 {playerWithBall.teamId === homeTeam.id ? `${homeTeam.locationName} ${homeTeam.nickname}` : `${awayTeam.locationName} ${awayTeam.nickname}`}!</p>}
+      </div>
       <div className="pf-buttons">
         <button className="button" type="submit" disabled={validatedFormData.gameId === 0}>
           {playEdit.id ? 'Update Play' : 'Add Play'}
