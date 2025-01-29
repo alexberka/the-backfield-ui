@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import { useAuth } from '@/utils/context/authContext';
 import Loading from '@/components/Loading';
 import SignIn from '@/components/SignIn';
-import NavBar from '@/components/NavBar';
+import NavBar from '@/components/header-footer/NavBar';
 import { usePathname } from 'next/navigation';
-import NavBarNoAuth from '../../components/NavBarNoAuth';
+import NavBarNoAuth from '../../components/header-footer/NavBarNoAuth';
 import UserForm from '../../components/forms/UserForm';
 
 function ViewDirectorBasedOnUserAuthStatus({ children }) {
@@ -25,11 +25,10 @@ function ViewDirectorBasedOnUserAuthStatus({ children }) {
     );
   }
 
-  // what the user should see if they are logged in
   if (user) {
     return (
       <>
-        {pathname !== '/' && <NavBar />} {/* NavBar only visible if user is logged in and is in every view */}
+        {pathname !== '/' && <NavBar />} {/* NavBar only visible if user is logged in and not on home page */}
         {user.sessionKey ? children : <UserForm />}
       </>
     );

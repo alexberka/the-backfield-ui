@@ -6,6 +6,7 @@ body {
   background: #212121;
   color: white;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  padding-bottom: 40px;
 }
 
 .welcome-box {
@@ -59,6 +60,28 @@ body {
   }
   .button {
     transform: scale(0.8);
+  }
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 20px;
+  box-shadow: inset 0 13px 10px -10px greenyellow;
+  background: #212121;
+  font-size: 0.7rem;
+  z-index: 10;
+  p {
+    position: absolute;
+    bottom: 0px;
+    font-family:'Courier New', Courier, monospace;
+    width: 100%;
+    margin: 0;
+    padding: 0 5px;
+    text-align: right;
+    color: rgba(172, 255, 47, 0.575);
+    font-weight: bold;
   }
 }
 

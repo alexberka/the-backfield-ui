@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Navbar, Container } from 'react-bootstrap';
-import { signIn } from '../utils/auth';
+import { signIn } from '../../utils/auth';
 
 export default function NavBarNoAuth() {
   return (
