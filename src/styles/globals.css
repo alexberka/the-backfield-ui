@@ -6,6 +6,7 @@ body {
   background: #212121;
   color: white;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  padding-bottom: 40px;
 }
 
 .welcome-box {
@@ -59,6 +60,28 @@ body {
   }
   .button {
     transform: scale(0.8);
+  }
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 20px;
+  box-shadow: inset 0 13px 10px -10px greenyellow;
+  background: #212121;
+  font-size: 0.7rem;
+  z-index: 10;
+  p {
+    position: absolute;
+    bottom: 0px;
+    font-family:'Courier New', Courier, monospace;
+    width: 100%;
+    margin: 0;
+    padding: 0 5px;
+    text-align: right;
+    color: rgba(172, 255, 47, 0.575);
+    font-weight: bold;
   }
 }
 
@@ -207,24 +230,94 @@ body {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    width: 60%;
+    width: 100%;
     margin: 0 auto;
-    label {
-      font-size: 1.5rem;
+    .check-button {
+      font-size: 1.3rem;
+      width: 40%;
     }
-    input {
-      margin: 0 5px;
+    .check-button.cb-selected {
+      font-size: 1.5rem;
     }
   }
   .playform-game-status {
+    width: 100%;
+    margin: 5px 0 10px;
+    .pf-gs-1 {
+      display: flex;
+      justify-content: space-between;
+      width: 35%;
+      margin: 10px auto;
+      .pf-game-period {
+        display: flex;
+        font-size: 1.2rem;
+        justify-content: right;
+        p {
+          margin: 0 4px;
+        }
+        .pf-game-period-select {
+          width: 50px;
+          height: 30px;
+          font-size: 1.2rem;
+          background: transparent;
+          border: none;
+          border-left: 1px solid gray;
+          color: greenyellow;
+        }
+      }
+    }
+    .pf-gs-2 {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      font-size: 1rem;
+      .pf-down {
+        background: #212121;
+        max-width: fit-content;
+        color: greenyellow;
+        text-align: right;
+        border: none;
+      }
+      .pf-to-go {
+        color: greenyellow;
+      }
+      .playform-line-of-scrimmage {
+        font-size: 1rem;
+        flex-grow: 1;
+      }
+    }
+  }
+  .pf-clock {
     display: flex;
-    .playform-game-period {
-      width: 50px;
+    align-items: top;
+    text-align: right;
+    .pf-clock-label {
+      margin: 0 5px;
+      height: 30px;
+      p {
+        margin: 0;
+        font-weight: bold;
+        font-style: italic;
+        font-size: 0.6rem;
+        align-self: top;
+      }
     }
-    .playform-to-go, .playform-line-of-scrimmage {
-      font-size: 1.2rem; 
-      margin-left: 10px;
+    .playform-timebox {
+      background: none;
+      border: none;
+      width: 3.1rem;
+      font-family: monospace;
+      color: greenyellow;
+      font-size: 1.7rem;
+      height: 30px;
+      outline: 1px solid greenyellow;
     }
+  }
+  .pf-clock-end-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 auto;
+    width: 35%;
   }
   .pf-field-position {
     position: relative;
@@ -314,11 +407,12 @@ body {
       color: rgb(86, 128, 24);
     }
   }
-  .pf-pass {
-    .pf-pass-root {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+  .pf-sel-combo {
+    display: flex;
+    gap: 15px;
+    p {
+      margin: 0;
+      color: greenyellow;
     }
   }
   .playform-interception {
@@ -332,16 +426,6 @@ body {
     display: flex;
     justify-content: space-around;
     margin: 10px 0;
-  }
-  .playform-timebox {
-    background: none;
-    border: none;
-    width: 3.1rem;
-    font-family: monospace;
-    color: greenyellow;
-    font-size: 1.7rem;
-    height: 30px;
-    outline: 1px solid greenyellow;
   }
   .pf-creator-header {
     display: flex;
@@ -387,6 +471,7 @@ body {
     .pf-lc-s1 {
       display: flex;
       gap: 10px;
+      margin: 7px 0;
     }
   }
   .pf-creator-collection {
@@ -414,14 +499,46 @@ body {
       border-top: none;
     }
   }
-  label {
-    display: flex;
+  .penalty-select {
+    background: #212121;
+    border-radius: 5px;
+    color: white;
+  }
+  .pf-hr-gray {
+    width: 100%;
+    margin: 10px auto;
+    border-bottom: 1px solid gray;
   }
   .pf-buttons {
     display: flex;
     justify-content: space-evenly;
     width: 100%;
     margin: 10px 0;
+  }
+  .pf-end-status {
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 1rem;
+    color: white;
+    margin: 10px auto;
+    gap: 20px;
+    p {
+      margin: 0;
+    }
+  }
+  .player-select {
+    background: #212121;
+    border-radius: 5px;
+    color: white;
+    max-width: 200px;
+  }
+  .input-dark {
+    background: #212121;
+    border: 1px solid gray;
+    color: white;
+    border-radius: 5px;
   }
 }
 
@@ -589,79 +706,6 @@ body {
       }
     }
   }
-  .gamestream-field {
-    position: relative;
-    display: flex;
-    justify-content: space-evenly;
-    width: 604px;
-    height: 267px;
-    /* border: 2px solid #45ff12; */
-    border: 2px solid greenyellow;
-    border-radius: 5px;
-    margin: 10px auto;
-    .gsf-to-gain {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      border: 1px solid #eb5547;
-      left: 50%;
-    }
-    .gsf-drive {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      left: 50%;
-      z-index: -2;
-    }
-    .gsf-ball-on {
-      position: absolute;
-      height: 100%;
-      width: 0;
-      border: 1px solid greenyellow;
-      left: 50%;
-    }
-    .gsf-yardline {
-      height: 100%;
-      width: 0px;
-      border: 1px solid white;
-      z-index: -2;
-    }
-    :nth-child(1 of .gsf-yardline), :nth-last-child(1 of .gsf-yardline) {
-      border: 1px solid greenyellow;
-    }
-    .gsf-home-team-endzone, .gsf-away-team-endzone {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: 50px;
-      background: linear-gradient();
-      z-index: -3;
-      p {
-        margin: 0 auto;
-        height: 263px;
-        writing-mode: vertical-rl;
-        text-align: center;
-        vertical-align: center;
-        font-weight: bold;
-        font-size: 1.5rem;
-        text-shadow: 2px 2px black;
-      }
-    }
-    .gsf-away-team-endzone {
-      right: 0;
-      border-radius: 0 3px 3px 0;
-    }
-    .gsf-home-team-endzone {
-      left: 0;
-      border-radius: 3px 0 0 3px;
-      p {
-        transform: rotate(-180deg);
-      }
-    }
-  }
-  .gsf-slim {
-    height: 40px;
-  }
   .gs-last-play {
     width: 800px;
     margin: 0 auto;
@@ -683,6 +727,80 @@ body {
       }
     }
   }
+}
+
+.gamestream-field {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  width: 604px;
+  height: 267px;
+  /* border: 2px solid #45ff12; */
+  border: 2px solid greenyellow;
+  border-radius: 5px;
+  margin: 10px auto;
+  .gsf-to-gain {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border: 1px solid #eb5547;
+    left: 50%;
+  }
+  .gsf-drive {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    left: 50%;
+    z-index: -2;
+  }
+  .gsf-ball-on {
+    position: absolute;
+    height: 100%;
+    width: 0;
+    border: 1px solid greenyellow;
+    left: 50%;
+  }
+  .gsf-yardline {
+    height: 100%;
+    width: 0px;
+    border: 1px solid white;
+    z-index: -2;
+  }
+  :nth-child(1 of .gsf-yardline), :nth-last-child(1 of .gsf-yardline) {
+    border: 1px solid greenyellow;
+  }
+  .gsf-home-team-endzone, .gsf-away-team-endzone {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50px;
+    background: linear-gradient();
+    z-index: -3;
+    p {
+      margin: 0 auto;
+      height: 263px;
+      writing-mode: vertical-rl;
+      text-align: center;
+      vertical-align: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px black;
+    }
+  }
+  .gsf-away-team-endzone {
+    right: 0;
+    border-radius: 0 3px 3px 0;
+  }
+  .gsf-home-team-endzone {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+    p {
+      transform: rotate(-180deg);
+    }
+  }
+}
+.gsf-slim {
+  height: 40px;
 }
 
 .stat-bar {
@@ -930,6 +1048,60 @@ body {
     justify-content: space-evenly;
     margin-bottom: 5px;
   }
+}
+
+.check-button {
+  font-size: 0.8rem;
+  color: white;
+  color: gray;
+  background: none;
+  border: none;
+  border-top: 2px solid transparent;
+  padding: 0;
+  font-weight: bold;
+}
+.check-button:hover {
+  background: none;
+  border-top: 2px solid greenyellow;
+}
+.check-button.cb-selected {
+  background: none;
+  border-top: 2px solid greenyellow;
+  color: white;
+}
+.check-button.cb-selected:hover {
+  border-top: 2px solid transparent;
+}
+
+.txt-gy {
+  color: greenyellow;
+}
+.txt-rd {
+  color: #eb5547;
+}
+.flex {
+  display: flex;
+}
+.flex.around {
+  justify-content: space-around;
+}
+.flex.evenly {
+  justify-content: space-evenly;
+}
+.flex.gap-10 {
+  gap: 10px;
+}
+.flex.gap-20 {
+  gap: 20px;
+}
+.mbot-10 {
+  margin-bottom: 10px;
+}
+.mtop-10 {
+  margin-top: 10px;
+}
+.width {
+  width: 100%;
 }
 
 .hidden {

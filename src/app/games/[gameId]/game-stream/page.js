@@ -11,6 +11,7 @@ import Loading from '../../../../components/Loading';
 import { useAuth } from '../../../../utils/context/authContext';
 import { deletePlay } from '../../../../api/playData';
 import DeletePlayModal from '../../../../components/modals/DeletePlayModal';
+import { GameStreamProvider } from '../../../../utils/context/gameStreamContext';
 
 export default function ManageGameStream({ params }) {
   const { gameId } = params;
@@ -52,8 +53,8 @@ export default function ManageGameStream({ params }) {
   }
 
   return (
-    <>
-      {gameStream.homeTeamScore !== undefined && <GameStream gameStream={gameStream} />}
+    <GameStreamProvider gameStream={gameStream}>
+      <GameStream />
       {formStatus === '' && (
         <div className="playform">
           <div className="pf-buttons">
@@ -72,7 +73,7 @@ export default function ManageGameStream({ params }) {
       )}
       <PlayForm key={0} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'new'} />
       <PlayForm key={gameStream?.lastPlay.id} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.lastPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'edit'} />
-    </>
+    </GameStreamProvider>
   );
 }
 

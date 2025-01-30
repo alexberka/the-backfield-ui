@@ -4,12 +4,17 @@
 
 import React, { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
+import Loading from '../../components/Loading';
 
 const GameStreamContext = createContext();
 
 GameStreamContext.displayName = 'GameStreamContext'; // Context object accepts a displayName string property. React DevTools uses this string to determine what to display for the context. https://reactjs.org/docs/context.html#contextdisplayname
 
 function GameStreamProvider({ gameStream, children }) {
+  if (gameStream === undefined) {
+    return <Loading />;
+  }
+
   return <GameStreamContext.Provider value={gameStream}>{children}</GameStreamContext.Provider>;
 }
 

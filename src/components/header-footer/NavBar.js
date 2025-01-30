@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Navbar, Container, Nav } from 'react-bootstrap';
 import { usePathname } from 'next/navigation';
-import { signOut } from '../utils/auth';
+import { signOut } from '../../utils/auth';
 
 export default function NavBar() {
   const pathname = usePathname();
