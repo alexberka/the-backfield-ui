@@ -7,6 +7,7 @@ import { getGameStream } from '../../../api/gameData';
 import GameStream from '../../../components/GameStream';
 import Loading from '../../../components/Loading';
 import { clientCredentials } from '../../../utils/client';
+import { GameStreamProvider } from '../../../utils/context/gameStreamContext';
 
 export default function WatchGameStream({ params }) {
   const { gameId } = params;
@@ -36,10 +37,10 @@ export default function WatchGameStream({ params }) {
   }
 
   return (
-    <>
+    <GameStreamProvider gameStream={gameStream}>
       {connection == null && <p>Attempting to establish connection...</p>}
-      <GameStream gameStream={gameStream} />;
-    </>
+      <GameStream />
+    </GameStreamProvider>
   );
 }
 

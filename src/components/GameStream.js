@@ -43,7 +43,8 @@ export default function GameStream() {
         <div className="gs-status-home-poss">{gameStream.nextPlay.teamId === gameStream.homeTeam.id && <h2>●</h2>}</div>
         <div className="gs-status-info">
           <p className="gssi-clock">
-            Q{gameStream.nextPlay.gamePeriod}
+            <span className="txt-gy">Q</span>
+            {gameStream.nextPlay.gamePeriod}
             &emsp;
             {Math.floor(gameStream.nextPlay.clockStart / 60)}:{(gameStream.nextPlay.clockStart % 60).toString().padStart(2, '0')}
           </p>
