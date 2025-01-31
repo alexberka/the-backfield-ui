@@ -1,102 +1,96 @@
-# Next.js Project Structure and File Explanation
+# The Backfield UI (v1.025.0130.1)
 
-This README provides an overview of the files and folders within the `src` directory of this Next.js project. The `app` directory is central to routing in Next.js with the App Router, defining how pages are structured, laid out, and dynamically generated.
+The Backfield UI is a React web application developed to provide an interface with [The Backfield API](https://github.com/alexberka/the-backfield), a data management system for American football statkeeping and live game tracking.
 
-## Folder Structure Overview
+## Technologies
 
-```plaintext
-src
-│
-├── api                    # API routes (currently empty with .gitkeep for future expansion)
-│
-├── app                    # Main directory for Next.js routing
-│   ├── delete-me          # Sample route folder with a simple page to demonstrate basic routing
-│   │   └── page.js        # A sample page component that can be used to learn basic routing and can be deleted in production
-│   │
-│   ├── layout.js          # The root layout component for the application
-│   ├── page.js            # The main entry point (home page) of the application
-│   ├── README.md          # Documentation file explaining the app structure
-│   └── favicon.ico        # The favicon for the application
-│
-├── components             # Contains reusable UI components
-│   ├── Loading.js         # A loading spinner component used to indicate loading states
-│   ├── NavBar.js          # The navigation bar component used across various pages
-│   └── SignIn.js          # A component for handling user sign-in
-│
-├── styles                 # Contains global styles for the application
-│   └── globals.css        # Global CSS file applied throughout the application
-│
-└── utils                  # Utility functions, context, and client-side logic
-    ├── context            # Context-related files for managing global state
-    │   ├── authContext.js # Context provider for managing user authentication state
-    │   ├── clientProvider.js # Wraps the application with necessary providers for client-side state management
-    │   └── ViewDirector.js # Component that directs views based on the user's authentication status
-    │
-    ├── sample-data        # Placeholder folder for any sample data files (currently empty with .gitkeep)
-    │   └── .gitkeep
-    │
-    ├── auth.js            # Utility functions for handling authentication logic
-    └── client.js          # Client-side setup for third-party services (e.g., Firebase client configuration)
+- React.js
+- CSS
+- SignalR
+- Bootstrap
+- Cactus UI
+
+## v1.025.0130.1 Features and Limitations
+
+This version of The Backfield UI allows users to:
+- Log in and create a profile (Google Firebase user auth)
+- View user-created teams, players, and games
+- Manage a game via game-stream page (add/update/delete Plays and view current game status)
+- Observe other users' games either logged in or logged out
+
+This version of The Backfield UI lacks functionality to add/update/delete Teams, Players, and Games. This must be accomplished via direct interaction with the APIs via Postman, Swagger, database manager, etc. Feature coming soon.
+
+## Get Started
+If you have not yet, visit [The Backfield API](https://github.com/alexberka/the-backfield) and follow the instructions to get it set up on your local machine. This project must be launched in a separate port upon starting the UI.
+
+Clone this repo and enter the following command in the project folder:
+
+```
+npm install
 ```
 
-## File and Folder Descriptions
+Once installation has completed, enter this command to launch the project locally:
 
-### `app` Directory
+```
+npm run dev
+```
 
-1. **`layout.js`**
-   - **Purpose**: Defines the root layout of the entire application, wrapping all pages with common elements like headers, footers, and global navigation. It helps maintain a consistent look and feel across the app.
-   - **Usage**: This file automatically applies the layout to all pages unless overridden by a more specific layout file in a subdirectory.
+If project does not open automatically in browser, click provided localhost link.
 
-2. **`page.js`**
-   - **Purpose**: The main entry point of the app, typically serving as the home page. This file is rendered when users visit the root URL of your application.
-   - **Usage**: Modify this file to customize the content of your home page.
+## Basic Views
 
-3. **`delete-me` Folder**
-   - **Purpose**: This folder contains a sample page to demonstrate basic routing in Next.js. It can be safely removed when starting a new project.
-   - **Files**:
-     - `page.js`: A simple component illustrating how to set up a new route. Meant for educational purposes.
+<p>Landing Page</p>
 
-4. **`README.md`**
-   - **Purpose**: Provides documentation about the `app` directory and overall project structure. This file serves as a guide for developers to understand the routing setup.
+![Landing Page](../../public/images/Backfield%20Landing%20Page.png)
 
-5. **`favicon.ico`**
-   - **Purpose**: The favicon of the application, displayed in the browser tab.
 
-### `components` Directory
+<p>Teams</p>
 
-1. **`Loading.js`**
-   - **Purpose**: A reusable loading spinner component used across the app to indicate loading states, especially during data fetching or authentication checks.
+![Team List](../../public/images/Backfield%20Team%20List.png)
 
-2. **`NavBar.js`**
-   - **Purpose**: The navigation bar component that appears on various pages, providing links to other parts of the application.
 
-3. **`SignIn.js`**
-   - **Purpose**: A component that handles the user sign-in interface, providing input fields and buttons for user authentication.
+<p>Team With Roster</p>
 
-### `styles` Directory
+![Team Roster](../../public/images/Backfield%20Team%20Roster.png)
 
-1. **`globals.css`**
-   - **Purpose**: Contains global CSS styles that are applied across the entire application, ensuring consistent design and layout.
 
-### `utils` Directory
+<p>Games</p>
 
-1. **`context` Folder**
-   - Contains context-related files for managing global state and logic.
+![Game List](../../public/images/Backfield%20Game%20List.png)
 
-   - **Files**:
-     - `authContext.js`: Provides context for managing user authentication state across the app. This file handles user state and authentication methods.
-     - `clientProvider.js`: Wraps the application with necessary providers, such as `AuthProvider`, to manage client-side state and logic.
-     - `ViewDirector.js`: A component that directs users to appropriate views based on their authentication status (e.g., showing a sign-in screen if not logged in).
+## Gamestream
 
-2. **`sample-data` Folder**
-   - **Purpose**: A placeholder for any sample data files used for testing or demo purposes. Currently, it contains a `.gitkeep` file to ensure the folder is tracked in version control.
+[Gamestream Walkthrough on YouTube](https://youtu.be/BaaFOEkmAuc)
 
-3. **`auth.js`**
-   - **Purpose**: Utility functions for handling authentication logic, such as signing in, signing out, and checking user status.
 
-4. **`client.js`**
-   - **Purpose**: Configures and initializes client-side services, such as Firebase, enabling client-side functionality across the app.
+<p>Gamestream Display</p>
 
----
+![Gamestream](../../public/images/Backfield%20Gamestream.png)
 
-This structure provides a clean, organized approach to building scalable Next.js applications using the App Router. It helps manage routing, layout, and state efficiently while keeping components modular and reusable.
+
+<p>Field Display Collapses in Full Stats View</p>
+
+![Gamestream Stats](../../public/images/Backfield%20Gamestream%20Open%20Stats.png)
+
+
+<p>Various Play Form Elements</p>
+
+![Play Form Open](../../public/images/Backfield%20Play%20Form.png)
+![Logging a Pass](../../public/images/Backfield%20Pass%20Form.png)
+![Logging a Blocked Punt](../../public/images/Backfield%20Punt%20Form%20Block.png)
+![Logging a Made Field Goal](../../public/images/Backfield%20Field%20Goal%20Form%20Good.png)
+![Logging a Fumble](../../public/images/Backfield%20Fumble%20Creator.png)
+
+## Data Validation
+
+The Backfield UI has a couple instruments of data validation when creating plays, but most of these are redundancies to avoid 400 errors being thrown by the server-side code, giving users a pre-submission warning that their plays are incomplete. As is, the rules were mostly developed around NFL play, and some of that may cause unnecessary restrictions on what information is needed to deem a play 'complete'. These restrictions will slowly be refined as the app is adapted for wider use.
+
+## A Note From The Developer:
+
+This project began as the final capstone for a course I took at Nashville Software School. Though not intended from the outset, it has become essentially a clone of ESPN's Gamecast (and I certainly didn't intend for 'Gamestream' to sound like such a B-movie we-can't-afford-the-rights repackaging of it). But having followed many football games through that utility rather than watching them, I had grown enamored with reverse engineering the logic and data structures behind bringing something like a Gamecast to life. And now when I am following a game in that manner and something doesn't seem quite right, I get a good chuckle from imagining the stat-entry intern choosing the wrong name from the dropdown (or what have you).
+
+Obviously, ESPN and their contemporaries have covered the nationally-televised football market as far as statkeeping goes, but the hope is for this application to be useful at all levels of the sport, high school, rec, intermural. Deployment impending.
+
+## The Name of the Developer:
+
+Alex Berka (A Football Fan Without A TV)
