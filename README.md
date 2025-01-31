@@ -81,17 +81,17 @@ If project does not open automatically in browser, click provided localhost link
 
 <p>Adding a Pass</p>
 
-![Logging a Pass](/public/images/Backfield%20Pass%20Form.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+![Logging a Pass](/public/images/Backfield%20Pass%20Form.png)
 
 
 <p>Adding a Punt With Kick Block</p>
 
-![Logging a Blocked Punt](/public/images/Backfield%20Punt%20Form%20Block.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+![Logging a Blocked Punt](/public/images/Backfield%20Punt%20Form%20Block.png)
 
 
 <p>Adding a Field Goal (Staged score changes appear above button bank)</p>
 
-![Logging a Made Field Goal](/public/images/Backfield%20Field%20Goal%20Form%20Good.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+![Logging a Made Field Goal](/public/images/Backfield%20Field%20Goal%20Form%20Good.png)
 
 
 <p>Adding a Fumble (When creating fumbles, laterals, and penalties, be sure to click 'Add' button to attach it to the play)</p>
