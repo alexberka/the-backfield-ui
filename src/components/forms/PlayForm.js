@@ -113,48 +113,6 @@ const initialDisplay = {
   penaltyCreator: false,
 };
 
-// const retainPlay = {
-//   passerId: null,
-//   receiverId: null,
-//   completion: false,
-//   rusherId: null,
-//   tacklerIds: [],
-//   passDefenderIds: [],
-//   kickoff: false,
-//   punt: false,
-//   fieldGoal: false,
-//   kickerId: null,
-//   kickReturnerId: null,
-//   kickFieldedAt: null,
-//   kickFairCatch: false,
-//   kickGood: false,
-//   kickTouchback: false,
-//   kickFake: false,
-//   touchdownPlayerId: null,
-//   extraPoint: false,
-//   conversion: false,
-//   extraPointKickerId: null,
-//   extraPointGood: false,
-//   extraPointFake: false,
-//   conversionPasserId: null,
-//   conversionReceiverId: null,
-//   conversionRusherId: null,
-//   conversionGood: false,
-//   defensiveConversion: false,
-//   conversionReturnerId: null,
-//   safety: false,
-//   cedingPlayerId: null,
-//   fumbles: [],
-//   interceptedById: null,
-//   interceptedAt: null,
-//   kickBlocked: false,
-//   kickBlockedById: null,
-//   kickBlockRecoveredById: null,
-//   kickBlockRecoveredAt: null,
-//   laterals: [],
-//   penalties: [],
-// };
-
 export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdit = initialState, visible = true }) {
   const [formData, setFormData] = useState({});
   const [validatedFormData, setValidatedFormData] = useState(initialState);
@@ -231,6 +189,14 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
     const resetValues = {};
     keys.forEach((key) => {
       resetValues[key] = playEdit[key] || initialState[key];
+    });
+    setFormData((prev) => ({ ...prev, ...resetValues }));
+  };
+
+  const selectiveDataFalse = (keys = []) => {
+    const resetValues = {};
+    keys.forEach((key) => {
+      resetValues[key] = false;
     });
     setFormData((prev) => ({ ...prev, ...resetValues }));
   };
@@ -1038,7 +1004,7 @@ export default function PlayForm({ gameId, homeTeam, awayTeam, onUpdate, playEdi
                   checked={formDisplay?.interception}
                   onClick={(e) => {
                     handleDisplay(e);
-                    selectiveReset(['completion']);
+                    selectiveDataFalse(['completion']);
                   }}
                 >
                   INTERCEPTION
