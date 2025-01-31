@@ -61,18 +61,22 @@ export default function ManageGameStream({ params }) {
             <button className="button" type="button" onClick={() => setFormStatus('new')}>
               Next Play
             </button>
-            <button className="button" type="button" onClick={() => setFormStatus('edit')}>
-              Edit Last Play
-            </button>
-            <button className="button button-red" type="button" onClick={() => setCheckDelete(true)} disabled={!gameStream.lastPlay.id > 0}>
-              Delete Last Play
-            </button>
-            {checkDelete && <DeletePlayModal onClose={hideModal} />}
+            {gameStream.nextPlay.prevPlayId > 0 && (
+              <>
+                <button className="button" type="button" onClick={() => setFormStatus('edit')}>
+                  Edit Last Play
+                </button>
+                <button className="button button-red" type="button" onClick={() => setCheckDelete(true)} disabled={!gameStream.lastPlay.id > 0}>
+                  Delete Last Play
+                </button>
+                {checkDelete && <DeletePlayModal onClose={hideModal} />}
+              </>
+            )}
           </div>
         </div>
       )}
       <PlayForm key={0} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.nextPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'new'} />
-      <PlayForm key={gameStream?.lastPlay.id} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.lastPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'edit'} />
+      {gameStream.nextPlay.prevPlayId > 0 && <PlayForm key={gameStream?.lastPlay.id} gameId={parseInt(gameId, 10)} onUpdate={hideForm} playEdit={gameStream?.lastPlay} homeTeam={gameStream?.homeTeam} awayTeam={gameStream?.awayTeam} visible={formStatus === 'edit'} />}
     </GameStreamProvider>
   );
 }
