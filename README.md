@@ -1,61 +1,113 @@
-# NextJS with Firebase Auth App Router Template
+# The Backfield UI (v1.025.0130.1)
 
-[See Live Demo of this Template](https://drt-next-js-template-app-router.netlify.app/)
+The Backfield UI is a React web application developed to provide an interface with [The Backfield API](https://github.com/alexberka/the-backfield), a data management system for American football statkeeping and live game tracking.
 
-## Topics
-- [Get Started](#get-started)
-- [Starting the Project](#starting-the-project)
-- [Deploying on Netlify](#deploying-on-netlify)
-___
-## Getting Started
-### Use Template
-#### 1. To get started, click the GREEN "Use this Template" button at the top of the repo
-<img width="915" alt="Screen Shot 2022-07-06 at 12 54 01 PM" src="https://user-images.githubusercontent.com/29741570/177612998-4aac9237-5a1e-4f13-8ae0-468587521564.png">
+## Technologies
 
-#### 2. Make sure YOUR github account is selected in the dropdown and name your project
-<img width="763" alt="Screen Shot 2022-07-06 at 12 54 48 PM" src="https://user-images.githubusercontent.com/29741570/177613126-dd38f678-7553-4f27-8a4a-75680f14d71e.png">
+- React.js
+- CSS
+- SignalR
+- Bootstrap
+- Cactus UI
 
-#### 3. Clone your new repo to your local machine
-#### 4. Go to the **NEXT** section
+## v1.025.0130.1 Features and Limitations
 
-## Starting the Project
-1. Create a Firebase project and set up authentication. Use [these videos](https://vimeo.com/showcase/codetracker-firebase) as a refresher if needed.
-1. Create a `.env` file at the root of the project
-1. Copy/Paste the contents of the `.env.sample` file to your newly created `.env` file.
-1. Copy over all of your Firebase values into the `.env` file.
-1. Open the `package.json` file and change the `name` property to the name of your application, and `author` to  your name.
-1. From your command line, be in the root directory and run `npm install` OR `npm i` for short.
-1. Next, run `npm run prepare`. This command sets up husky to track eslint errors on commit that will make your deploy fail on Netlify.
-1. Run `npx eslint . --ext .js,.jsx`
-1. To start your application, run `npm run dev`. THIS IS THE COMMAND YOU WILL USE TO RUN YOUR DEVELOPMENT SERVER FROM NOW ON.
-1. Open [http://localhost:3000](http://localhost:3000) with your browser.
+This version of The Backfield UI allows users to:
+- Log in and create a profile (Google Firebase user auth)
+- View user-created teams, players, and games
+- Manage a game via game-stream page (add/update/delete Plays and view current game status)
+- Observe other users' games either logged in or logged out
 
-### If you see this, you are set to go!
-<img width="450" alt="Screen Shot 2022-07-06 at 1 07 27 PM" src="https://github.com/user-attachments/assets/deae25f0-01d5-44b4-be60-7297b0f6f0ef">
+This version of The Backfield UI lacks functionality to add/update/delete Teams, Players, and Games. This must be accomplished via direct interaction with the APIs via Postman, Swagger, database manager, etc. Feature coming soon.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Get Started
+If you have not yet, visit [The Backfield API](https://github.com/alexberka/the-backfield) and follow the instructions to get it set up on your local machine. This project must be launched in a separate port upon starting the UI.
 
-**NOTES:** 
-- If you see the following error, you did not follow all the setup steps correctly and failed to add your Firebase creds. Go back and do that NOW.
+Clone this repo and enter the following command in the project folder:
 
-<img width="1043" alt="Screen Shot 2022-07-06 at 11 18 45 AM" src="https://user-images.githubusercontent.com/29741570/177612501-c2628f18-4bbd-4de9-aae6-27ffba1172d6.png">
+```
+npm install
+```
 
-### Deploying on Netlify
-Netlify will automatically detect your project and prepopulate the settings, but should something go wrong and it does not, here are the commands:
+Once installation has completed, enter this command to launch the project locally:
 
-- Build Command: `npm run build`
-- Publish directory: `.next`
+```
+npm run dev
+```
 
-#### Additional Steps to Take on Netlify
-- Add Environmental Variables
-    - Any Enviromental variables you are using in your `.env` file should be added to Netlify. 
-        - Go to Site settings > Build & deploy > Environment > Environment variables and the keys and values there if you did not add them when you were deploying your site
+If project does not open automatically in browser, click provided localhost link.
 
-- Update Firebase URL Settings
-    - In Firebase under Authentication select sign in methods, scroll to Authorized domains. Add your Netlify URL.
-        
-## Learn More about Next.js
-To learn more about Next.js, take a look at the following resources:
+## Basic Views
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<p>Landing Page</p>
+
+![Landing Page](/public/images/Backfield%20Landing%20Page.png)
+
+
+<p>Teams</p>
+
+![Team List](/public/images/Backfield%20Team%20List.png)
+
+
+<p>Team With Roster</p>
+
+![Team Roster](/public/images/Backfield%20Team%20Roster.png)
+
+
+<p>Games</p>
+
+![Game List](/public/images/Backfield%20Game%20List.png)
+
+## Gamestream
+
+[Gamestream Walkthrough on YouTube](https://youtu.be/BaaFOEkmAuc)
+
+
+<p>Gamestream Display</p>
+
+![Gamestream](/public/images/Backfield%20Gamestream.png)
+
+
+<p>Field Display Collapses in Full Stats View</p>
+
+![Gamestream Stats](/public/images/Backfield%20Gamestream%20Open%20Stats.png)
+
+### Various Play Form Elements
+
+<p>Open Form</p>
+
+![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+
+
+<p>Adding a Pass</p>
+
+![Logging a Pass](/public/images/Backfield%20Pass%20Form.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+
+
+<p>Adding a Punt With Kick Block</p>
+
+![Logging a Blocked Punt](/public/images/Backfield%20Punt%20Form%20Block.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+
+
+<p>Adding a Field Goal (Staged score changes appear above button bank)</p>
+
+![Logging a Made Field Goal](/public/images/Backfield%20Field%20Goal%20Form%20Good.png)![Play Form Open](/public/images/Backfield%20Play%20Form.png)
+
+
+<p>Adding a Fumble (When creating fumbles, laterals, and penalties, be sure to click 'Add' button to attach it to the play)</p>
+
+![Logging a Fumble](/public/images/Backfield%20Fumble%20Creator.png)
+
+## Data Validation
+
+The Backfield UI has a couple instruments of data validation when creating plays, but most of these are redundancies to avoid 400 errors being thrown by the server-side code, giving users a pre-submission warning that their plays are incomplete. As is, the rules were mostly developed around NFL play, and some of that may cause unnecessary restrictions on what information is needed to deem a play 'complete'. These restrictions will slowly be refined as the app is adapted for wider use.
+
+## A Note From The Developer:
+
+This project began as the final capstone for a course I took at Nashville Software School. Though not intended from the outset, it has become essentially a clone of ESPN's Gamecast (and I certainly didn't intend for 'Gamestream' to sound like such a B-movie we-can't-afford-the-rights repackaging of it). But having followed many football games through that utility rather than watching them, I had grown enamored with reverse engineering the logic and data structures behind bringing something like a Gamecast to life. And now when I am following a game in that manner and something doesn't seem quite right, I get a good chuckle from imagining the stat-entry intern choosing the wrong name from the dropdown (or what have you).
+
+Obviously, ESPN and their contemporaries have covered the nationally-televised football market as far as statkeeping goes, but the hope is for this application to be useful at all levels of the sport, high school, rec, intermural. Deployment impending.
+
+## The Name of the Developer:
+
+Alex Berka (A Football Fan Without A TV)
