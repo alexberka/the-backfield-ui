@@ -106,7 +106,7 @@ The Backfield UI has a couple instruments of data validation when creating plays
 
 This project began as the final capstone for a course I took at Nashville Software School. Though not intended from the outset, it has become essentially a clone of ESPN's Gamecast (and I certainly didn't intend for 'Gamestream' to sound like such a B-movie we-can't-afford-the-rights repackaging of it). But having followed many football games through that utility rather than watching them, I had grown enamored with reverse engineering the logic and data structures behind bringing something like a Gamecast to life. And now when I am following a game in that manner and something doesn't seem quite right, I get a good chuckle from imagining the stat-entry intern choosing the wrong name from the dropdown (or what have you).
 
-Obviously, ESPN and their contemporaries have covered the nationally-televised football market as far as statkeeping goes, but the hope is for this application to be useful at all levels of the sport, high school, rec, intermural. Deployment impending.
+Obviously, ESPN and their contemporaries have covered the nationally-televised football market as far as statkeeping goes, but the hope is for this application to be useful at all levels of the sport, high school, rec, intramural. Deployment (im)pending.
 
 ## The Name of the Developer:
 
